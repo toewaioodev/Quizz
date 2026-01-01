@@ -1,0 +1,40 @@
+{
+  "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
+  "resources/js/Components/DropDown.tsx": [
+    "/build/assets/Navbar-COkYh6-d.js"
+  ],
+  "resources/js/Components/LanguageSwitcher.tsx": [
+    "/build/assets/Navbar-COkYh6-d.js"
+  ],
+  "resources/js/Components/Navbar.tsx": [
+    "/build/assets/Navbar-COkYh6-d.js"
+  ],
+  "resources/js/Components/ThemeSwitcher.tsx": [
+    "/build/assets/Navbar-COkYh6-d.js"
+  ],
+  "resources/js/pages/Arena.tsx": [
+    "/build/assets/Arena-BGNjJgIK.js"
+  ],
+  "resources/js/pages/Auth/Login.tsx": [
+    "/build/assets/Login-DBh-90dH.js"
+  ],
+  "resources/js/pages/Auth/Register.tsx": [
+    "/build/assets/Register-B5X3cbXJ.js"
+  ],
+  "resources/js/pages/Dashboard.tsx": [
+    "/build/assets/Dashboard-BHLcsdrF.js"
+  ],
+  "resources/js/pages/Leaderboard/Index.tsx": [
+    "/build/assets/Index-CdTztJgR.js"
+  ],
+  "resources/js/pages/Lobby.tsx": [
+    "/build/assets/Lobby-BDxj_oZl.js"
+  ],
+  "resources/js/pages/Profile/Show.tsx": [
+    "/build/assets/Show-NaT2_47T.js"
+  ],
+  "resources/js/pages/welcome.tsx": [
+    "/build/assets/welcome-7SnUOAs3.js"
+  ],
+  "resources/js/ssr.tsx": []
+}

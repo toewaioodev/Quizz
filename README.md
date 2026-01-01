@@ -1,4 +1,4 @@
-# Toewaioo
+# Quizz
 
 A real-time, AI-powered competitive quiz application built with the latest web technologies. Challenge opponents in 1v1 battles, test your knowledge with AI-generated quizzes, and climb the leaderboard.
 
@@ -14,12 +14,14 @@ A real-time, AI-powered competitive quiz application built with the latest web t
 ## 🛠 Tech Stack
 
 ### Backend
+
 - **Framework**: [Laravel 12](https://laravel.com)
 - **Real-time**: [Ably](https://ably.com)
 - **AI**: [Google Gemini](https://ai.google.dev/)
 - **Database**: SQLite (Development) / MySQL (Production)
 
 ### Frontend
+
 - **Framework**: [React 19](https://react.dev)
 - **Routing/Glue**: [Inertia.js 2.0](https://inertiajs.com)
 - **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com)
@@ -36,54 +38,61 @@ A real-time, AI-powered competitive quiz application built with the latest web t
 ## ⚡ Installation & Setup
 
 1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/app-1.git
-   cd app-1
-   ```
+
+    ```bash
+    git clone https://github.com/toewaioo/Quizz.git
+    cd Quizz
+    ```
 
 2. **Install Dependencies**
-   ```bash
-   composer install
-   npm install
-   ```
+
+    ```bash
+    composer install
+    npm install
+    ```
 
 3. **Environment Setup**
    Copy the example environment file and configure your keys.
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Update `.env` with your credentials:
-   ```ini
-   # Database
-   DB_CONNECTION=sqlite
 
-   # Ably (Real-time)
-   ABLY_KEY=your-ably-api-key
+    ```bash
+    cp .env.example .env
+    ```
 
-   # Google Gemini (AI)
-   GEMINI_API_KEY=your-gemini-api-key
-   ```
+    Update `.env` with your credentials:
+
+    ```ini
+    # Database
+    DB_CONNECTION=sqlite
+
+    # Ably (Real-time)
+    ABLY_KEY=your-ably-api-key
+
+    # Google Gemini (AI)
+    GEMINI_API_KEY=your-gemini-api-key
+    ```
 
 4. **Initialize Project**
    This command sets up the database and runs migrations.
-   ```bash
-   php artisan key:generate
-   php artisan migrate
-   ```
-   
-   *Alternatively, you can run the setup script:*
-   ```bash
-   composer run setup
-   ```
+
+    ```bash
+    php artisan key:generate
+    php artisan migrate
+    ```
+
+    _Alternatively, you can run the setup script:_
+
+    ```bash
+    composer run setup
+    ```
 
 5. **Run Development Server**
    Start the Laravel server, Vite, and Queue worker concurrently.
-   ```bash
-   composer run dev
-   ```
 
-   Access the application at `http://localhost:8000`.
+    ```bash
+    composer run dev
+    ```
+
+    Access the application at `http://localhost:8000`.
 
 ## 📂 Project Structure
 

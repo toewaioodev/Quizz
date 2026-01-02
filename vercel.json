@@ -13,6 +13,7 @@
         { "src": "/public/**", "use": "@vercel/static" },
         { "src": "/public/build/**", "use": "@vercel/static" },
         { "src": "/public/images/icons/**", "use": "@vercel/static" },
+        { "src": "/public/images/**", "use": "@vercel/static" },
         { "src": "/storage/api-docs/**", "use": "@vercel/static" }
     ],
 
@@ -30,6 +31,7 @@
         },
         { "src": "/assets/(.*)", "dest": "public/assets/$1" },
         { "src": "/images/(.*)", "dest": "public/images/icons/$1" },
+        { "src": "/images/(.*)", "dest": "public/images/$1" },
         { "src": "/js/(.*)", "dest": "public/js/$1" },
         {
             "src": "/(css|js)/(.*)",

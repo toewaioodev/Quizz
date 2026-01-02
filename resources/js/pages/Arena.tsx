@@ -1,7 +1,7 @@
 import * as Ably from 'ably';
-import { AblyProvider, ChannelProvider, useChannel, useConnectionStateListener } from 'ably/react';
+import { AblyProvider, ChannelProvider, useChannel, useConnectionStateListener, usePresence } from 'ably/react';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
@@ -29,7 +29,7 @@ interface Message {
 // Wrapper to provide Ably Context
 export default function ArenaPage({ match, ably_key }: { match: any, ably_key: string }) {
     const user = usePage<SharedData>().props.auth.user;
-    const client = new Ably.Realtime({ key: ably_key, clientId: String(user.id) });
+    const client = useMemo(() => new Ably.Realtime({ key: ably_key, clientId: String(user.id) }), [ably_key, user.id]);
 
     return (
         <AblyProvider client={client}>
@@ -55,6 +55,13 @@ function Arena({ match }: { match: any }) {
     const [opponentAnswered, setOpponentAnswered] = useState(false);
 
     const [questionCount, setQuestionCount] = useState(0);
+
+    // Auto-start visual state if opponent is already present (e.g. Player 2 joining)
+    useEffect(() => {
+        if (opponent && gameState === 'waiting') {
+            setGameState('starting');
+        }
+    }, [opponent, gameState]);
 
     // Ably Channel Logic
     const { t, i18n } = useTranslation();
@@ -90,11 +97,22 @@ function Arena({ match }: { match: any }) {
         console.log('Ably connection state:', stateChange.current);
     });
 
+    // Presence Logic
+    const { presenceData } = usePresence(`match:${match.channel_id}`);
+    const [opponentPresent, setOpponentPresent] = useState(false);
+
+    useEffect(() => {
+        // Check if opponent is in presence data
+        const isOpponentHere = (presenceData || []).some(p => p.clientId === String(opponent?.id));
+        setOpponentPresent(isOpponentHere);
+    }, [presenceData, opponent]);
+
     // Start Game - Only Player 1 needs to trigger this usually, or Server side.
     const isPlayer1 = match.player1_id === user.id;
 
     const startGame = async () => {
-        if (isPlayer1) {
+        // Only start if we are player 1 AND opponent is actually here
+        if (isPlayer1) { // Removed strict opponent check for now to allow async join, but can add back
             await fetchNextQuestion();
         }
     };
@@ -125,7 +143,7 @@ function Arena({ match }: { match: any }) {
         // but broadly accurate for MVP. Ideally server decides based on match state.
         let winnerId = null;
         if (score > opponentScore) winnerId = user.id;
-        else if (opponentScore > score) winnerId = opponent.id;
+        else if (opponentScore > score) winnerId = opponent?.id; // Handle possibility of opponent being null/undefined safety
 
         // Only Player 1 calls the endpoint to avoid double submission
         if (isPlayer1) {
@@ -202,8 +220,9 @@ function Arena({ match }: { match: any }) {
 
                 <div className="flex flex-col items-center">
                     {opponent ? (
-                        <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-xl font-bold mb-2 shadow-[0_0_30px_rgba(220,38,38,0.6)] border-2 border-red-400">
+                        <div className={`relative w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-2 shadow-[0_0_30px_rgba(220,38,38,0.6)] border-2 ${opponentPresent ? 'border-green-400 bg-red-600' : 'border-slate-500 bg-slate-700 grayscale'}`}>
                             {opponent.name ? opponent.name.charAt(0) : '?'}
+                            <div className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-slate-900 ${opponentPresent ? 'bg-green-500' : 'bg-slate-500'}`} />
                         </div>
                     ) : (
                         <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center text-xl font-bold mb-2 animate-pulse border border-slate-700">
@@ -211,6 +230,7 @@ function Arena({ match }: { match: any }) {
                         </div>
                     )}
                     <span className="font-bold text-lg">{opponent ? opponent.name : t('Searching...')}</span>
+                    {!opponentPresent && opponent && <span className="text-xs text-red-500 font-bold uppercase tracking-widest">{t('OFFLINE')}</span>}
                     <span className="text-4xl font-black text-red-400 mt-2">{opponentScore}</span>
                 </div>
             </div>

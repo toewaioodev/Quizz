@@ -34,8 +34,10 @@ class GameController extends Controller
         }
         
         // Simple matchmaking logic: Find a pending match or create one
+        // FIX: Only look for matches created/updated in the last 60 seconds to avoid 'ghost' matches
         $pendingMatch = QuizMatch::where('status', 'pending')
             ->where('player1_id', '!=', $user->id)
+            ->where('updated_at', '>=', now()->subMinute())
             ->first();
 
         if ($pendingMatch) {

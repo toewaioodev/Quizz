@@ -28,7 +28,7 @@ export default function Dashboard({ categoryCounts }: { categoryCounts: Record<s
             const res = await axios.post('/quiz/generate', {
                 topic: catId,
                 difficulty: user.settings?.difficulty || 'medium', // Use user preference or default
-                language: i18n.language // Pass current language
+                language: i18n.language ? i18n.language : 'my' // Pass current language
             });
             setCurrentQuestion(res.data);
         } catch (error) {

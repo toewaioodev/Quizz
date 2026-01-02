@@ -1,0 +1,258 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\QuizMatch;
+use App\Models\Question;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+class GameStateService
+{
+    protected $ablyService;
+
+    public function __construct(AblyService $ablyService)
+    {
+        $this->ablyService = $ablyService;
+    }
+
+    public function startGame(QuizMatch $match)
+    {
+        // 1. Select 5 random questions
+        // Ideally we pick based on user preference or random
+        $questions = Question::inRandomOrder()->limit(5)->get();
+        $questionIds = $questions->pluck('id')->toArray();
+
+        // 2. Initialize Match State
+        $match->update([
+            'status' => 'active',
+            'current_question_index' => 0,
+            'questions_sequence' => $questionIds,
+            'player_scores' => [
+                'p1' => 0, 
+                'p2' => 0
+            ],
+            'last_question_at' => now(), // Initialize
+        ]);
+
+        // 3. Publish Game Start Event
+        $this->ablyService->publish(
+            "match:{$match->channel_id}",
+            'match:start',
+            [
+                'match_id' => $match->id,
+                'total_questions' => 5,
+                'start_time' => now()->timestamp
+            ]
+        );
+
+        // 4. Send First Question (after small delay or immediately)
+        $this->sendQuestion($match, $questions->first(), 0);
+    }
+
+    public function sendQuestion(QuizMatch $match, Question $question, int $index)
+    {
+        // Update timestamp for scoring verification and reset answers
+        $match->update([
+            'last_question_at' => now(),
+            'round_answers' => [] 
+        ]);
+
+        // We strip the correct answer for security
+        $payload = [
+            'question_id' => $question->id,
+            'text' => $question->question_text,
+            'options' => $question->options, // assumed JSON/array
+            'category' => $question->category,
+            'round_index' => $index + 1,
+            'total_rounds' => 5,
+            'time_limit' => 15,
+            'sent_at' => now()->timestamp
+        ];
+
+        $this->ablyService->publish(
+            "match:{$match->channel_id}",
+            'game:question',
+            $payload
+        );
+    }
+
+    public function submitAnswer($matchId, $userId, $questionId, $answer)
+    {
+        $match = QuizMatch::findOrFail($matchId);
+        
+        if ($match->player1_id != $userId && $match->player2_id != $userId) {
+            return ['error' => 'Not a player in this match'];
+        }
+
+        $question = Question::find($questionId);
+        if (!$question) return ['error' => 'Question not found'];
+        
+        // Prevent double answering
+        $answers = $match->round_answers ?? [];
+        $playerKey = ($userId == $match->player1_id) ? 'p1' : 'p2';
+        
+        if (isset($answers[$playerKey])) {
+            return ['error' => 'Already answered'];
+        }
+
+        $isCorrect = $question->correct_answer === $answer;
+        $points = 0;
+
+        if ($isCorrect) {
+            // Server calc: Time since question sent
+            $sentAt = $match->last_question_at;
+            $now = now();
+            // Diff in seconds (float)
+            $diffInSeconds = $sentAt ? $now->diffInSeconds($sentAt) : 15; // default to max time if null
+            
+            // Assume 15s limit. 
+            // If they tool 2s, remaining = 13s. Points = 13 * 10
+            $timeTaken = abs($diffInSeconds); // safety
+            $timeRemaining = max(15 - $timeTaken, 0);
+            
+            $points = (int) round($timeRemaining * 10);
+        }
+
+        // Update Score State in memory
+        $scores = $match->player_scores ?? ['p1' => 0, 'p2' => 0];
+        $scores[$playerKey] += $points;
+        
+        // Update Answers
+        $answers[$playerKey] = $answer; // or just true if we don't care about inspecting later
+
+        $match->update([
+            'player_scores' => $scores,
+            'round_answers' => $answers
+        ]);
+
+        $this->ablyService->publish(
+            "match:{$match->channel_id}",
+            'game:answered',
+            ['clientId' => (string)$userId]
+        );
+        
+        // Check if both answered
+        if (count($answers) >= 2) {
+            // Wait a moment before resolving? Or resolve immediately?
+            // Resolve immediately and let frontend handle visual delay
+            $this->concludeRound($match);
+        }
+
+        return [
+            'correct' => $isCorrect,
+            'points' => $points,
+            'new_score' => $scores[$playerKey],
+            'answers_count' => count($answers)
+        ];
+    }
+    
+    public function getCurrentState($matchId)
+    {
+        $match = QuizMatch::findOrFail($matchId);
+        
+        // Construct state object for frontend recovery
+        $currentQId = $match->questions_sequence[$match->current_question_index] ?? null;
+        $currentQuestion = null;
+        
+        if ($currentQId) {
+             $q = Question::find($currentQId);
+             if ($q) {
+                 $currentQuestion = [
+                    'question_id' => $q->id,
+                    'text' => $q->question_text,
+                    'options' => $q->options,
+                    'category' => $q->category,
+                    'round_index' => $match->current_question_index + 1,
+                    'total_rounds' => 5,
+                    'time_limit' => 15,
+                    'sent_at' => $match->last_question_at ? $match->last_question_at->timestamp : now()->timestamp
+                 ];
+             }
+        }
+
+        return [
+            'status' => $match->status, // 'active', 'completed', etc.
+            'currentQuestion' => $currentQuestion,
+            'playerScores' => $match->player_scores,
+            'timer_start' => $match->last_question_at ? $match->last_question_at->timestamp : null
+        ];
+    }
+    
+    // Call this when both answered
+    public function concludeRound(QuizMatch $match)
+    {
+         $currentIndex = $match->current_question_index;
+         $sequence = $match->questions_sequence;
+         
+         // Get current question to reveal answer
+         $currentQId = $sequence[$currentIndex] ?? null;
+         $correctAnswer = null;
+         if ($currentQId) {
+             $q = Question::find($currentQId);
+             $correctAnswer = $q ? $q->correct_answer : null;
+         }
+
+         $this->ablyService->publish(
+             "match:{$match->channel_id}",
+             'game:round_result',
+             [
+                 'correct_option' => $correctAnswer,
+                 'player_scores' => $match->player_scores,
+                 'round_index' => $currentIndex + 1
+             ]
+         );
+    }
+    
+    // Call this to move to next question
+    public function triggerNextQuestion(QuizMatch $match)
+    {
+         $currentIndex = $match->current_question_index;
+         $sequence = $match->questions_sequence;
+         
+         if ($currentIndex + 1 >= count($sequence)) {
+             $this->endGame($match);
+         } else {
+             $match->increment('current_question_index');
+             // Send next question
+             $this->sendQuestion($match, Question::find($sequence[$currentIndex + 1]), $currentIndex + 1);
+         }
+    }
+
+    public function endGame(QuizMatch $match)
+    {
+        $scores = $match->player_scores;
+        $p1Score = $scores['p1'];
+        $p2Score = $scores['p2'];
+
+        $winnerId = null;
+        if ($p1Score > $p2Score) $winnerId = $match->player1_id;
+        elseif ($p2Score > $p1Score) $winnerId = $match->player2_id;
+
+        $match->update([
+            'status' => 'completed',
+            'winner_id' => $winnerId
+        ]);
+        
+        // Update User stats
+        if ($winnerId) {
+            User::where('id', $winnerId)->increment('points', 50);
+            User::where('id', $winnerId)->increment('wins', 1);
+            
+            $loserId = ($winnerId == $match->player1_id) ? $match->player2_id : $match->player1_id;
+            if ($loserId) {
+                User::where('id', $loserId)->decrement('points', 10);
+                User::where('id', $loserId)->increment('losses', 1);
+            }
+        }
+
+        $this->ablyService->publish(
+            "match:{$match->channel_id}",
+            'game:over',
+            [
+                'winner_id' => $winnerId,
+                'final_scores' => $scores
+            ]
+        );
+    }
+}

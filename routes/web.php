@@ -42,7 +42,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/lobby', [GameController::class, 'lobby'])->name('lobby');
     Route::post('/match/find', [GameController::class, 'findMatch'])->name('match.find');
     Route::get('/arena/{id}', [GameController::class, 'arena'])->name('arena');
-    Route::post('/match/end', [GameController::class, 'endMatch'])->name('match.end');
+    Route::post('/match/{id}/start', [GameController::class, 'startMatch'])->name('match.start');
+    Route::post('/match/{id}/answer', [GameController::class, 'submitAnswer'])->name('match.answer');
+    Route::get('/match/{id}/state', [GameController::class, 'getCurrentState'])->name('match.state');
+    Route::post('/match/{id}/next', [GameController::class, 'nextQuestion'])->name('match.next');
     
     // Solo Quiz
     Route::post('/quiz/answer', [QuizController::class, 'answer']);

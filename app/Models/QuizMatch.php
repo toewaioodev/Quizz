@@ -17,6 +17,18 @@ class QuizMatch extends Model
         'winner_id',
         'status',
         'channel_id',
+        'current_question_index',
+        'questions_sequence',
+        'player_scores',
+        'last_question_at',
+        'round_answers',
+    ];
+
+    protected $casts = [
+        'questions_sequence' => 'array',
+        'player_scores' => 'array',
+        'last_question_at' => 'datetime',
+        'round_answers' => 'array',
     ];
 
     public function player1()

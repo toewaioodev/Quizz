@@ -13,9 +13,16 @@ use App\Http\Controllers\QuizController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\ProfileController;
 
-// Route::get('/', function () {
-//     return Inertia::render('welcome');
-// })->name('home');
+Route::get('/', function () {
+    return Inertia::render('welcome');
+})->name('home');
+
+Route::get('/about', function () { return Inertia::render('About'); })->name('about');
+Route::get('/features', function () { return Inertia::render('Features'); })->name('features');
+Route::get('/pricing', function () { return Inertia::render('Pricing'); })->name('pricing');
+Route::get('/faq', function () { return Inertia::render('FAQ'); })->name('faq');
+Route::get('/privacy', function () { return Inertia::render('Privacy'); })->name('privacy');
+Route::get('/terms', function () { return Inertia::render('Terms'); })->name('terms');
 
 // Guest Routes
 

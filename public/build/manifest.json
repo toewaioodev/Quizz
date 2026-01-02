@@ -1,36 +1,44 @@
 {
-  "_ChannelProvider-DJDLJJzD.js": {
-    "file": "assets/ChannelProvider-DJDLJJzD.js",
+  "_ChannelProvider-DSE01W-M.js": {
+    "file": "assets/ChannelProvider-DSE01W-M.js",
     "name": "ChannelProvider",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_Navbar-DB_5wZFl.js": {
-    "file": "assets/Navbar-DB_5wZFl.js",
+  "_Navbar-DzcdfMEv.js": {
+    "file": "assets/Navbar-DzcdfMEv.js",
     "name": "Navbar",
     "imports": [
       "resources/js/app.tsx",
-      "_compiler-runtime-BE8wk9yF.js",
-      "_useTranslation-COeW6Ggc.js"
+      "_compiler-runtime-DsFBfS2b.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
     ]
   },
-  "_compiler-runtime-BE8wk9yF.js": {
-    "file": "assets/compiler-runtime-BE8wk9yF.js",
+  "_ThemeSwitcher-DF4ydx8B.js": {
+    "file": "assets/ThemeSwitcher-DF4ydx8B.js",
+    "name": "ThemeSwitcher",
+    "imports": [
+      "resources/js/app.tsx",
+      "_compiler-runtime-DsFBfS2b.js"
+    ]
+  },
+  "_UserGroupIcon-BzkrlS4j.js": {
+    "file": "assets/UserGroupIcon-BzkrlS4j.js",
+    "name": "UserGroupIcon",
+    "imports": [
+      "resources/js/app.tsx"
+    ]
+  },
+  "_compiler-runtime-DsFBfS2b.js": {
+    "file": "assets/compiler-runtime-DsFBfS2b.js",
     "name": "compiler-runtime",
     "imports": [
       "resources/js/app.tsx"
     ]
   },
-  "_useTranslation-COeW6Ggc.js": {
-    "file": "assets/useTranslation-COeW6Ggc.js",
-    "name": "useTranslation",
-    "imports": [
-      "resources/js/app.tsx"
-    ]
-  },
   "resources/css/app.css": {
-    "file": "assets/app-BzCSx4zY.css",
+    "file": "assets/app-iB3O1KR7.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "names": [
@@ -38,139 +46,237 @@
     ]
   },
   "resources/js/app.tsx": {
-    "file": "assets/app-715AsBo8.js",
+    "file": "assets/app-B6ymVI_o.js",
     "name": "app",
     "src": "resources/js/app.tsx",
     "isEntry": true,
     "dynamicImports": [
+      "resources/js/pages/About.tsx",
       "resources/js/pages/Arena.tsx",
       "resources/js/pages/Auth/Login.tsx",
       "resources/js/pages/Auth/Register.tsx",
       "resources/js/pages/Dashboard.tsx",
+      "resources/js/pages/FAQ.tsx",
+      "resources/js/pages/Features.tsx",
       "resources/js/pages/Leaderboard/Index.tsx",
       "resources/js/pages/Lobby.tsx",
+      "resources/js/pages/Pricing.tsx",
+      "resources/js/pages/Privacy.tsx",
       "resources/js/pages/Profile/Show.tsx",
+      "resources/js/pages/Terms.tsx",
       "resources/js/pages/welcome.tsx"
     ],
     "css": [
-      "assets/app-BzCSx4zY.css"
+      "assets/app-iB3O1KR7.css"
+    ]
+  },
+  "resources/js/pages/About.tsx": {
+    "file": "assets/About-Dk0pjrVW.js",
+    "name": "About",
+    "src": "resources/js/pages/About.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_compiler-runtime-DsFBfS2b.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
+    ],
+    "css": [
+      "assets/app-iB3O1KR7.css"
     ]
   },
   "resources/js/pages/Arena.tsx": {
-    "file": "assets/Arena-CwcXDtU3.js",
+    "file": "assets/Arena-DltZjucu.js",
     "name": "Arena",
     "src": "resources/js/pages/Arena.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_compiler-runtime-BE8wk9yF.js",
-      "_ChannelProvider-DJDLJJzD.js",
-      "_useTranslation-COeW6Ggc.js"
+      "_compiler-runtime-DsFBfS2b.js",
+      "_ChannelProvider-DSE01W-M.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
     ],
     "css": [
-      "assets/app-BzCSx4zY.css"
+      "assets/app-iB3O1KR7.css"
     ]
   },
   "resources/js/pages/Auth/Login.tsx": {
-    "file": "assets/Login-CW3bqvGE.js",
+    "file": "assets/Login-CzWAnCk4.js",
     "name": "Login",
     "src": "resources/js/pages/Auth/Login.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_compiler-runtime-BE8wk9yF.js"
+      "_compiler-runtime-DsFBfS2b.js"
     ],
     "css": [
-      "assets/app-BzCSx4zY.css"
+      "assets/app-iB3O1KR7.css"
     ]
   },
   "resources/js/pages/Auth/Register.tsx": {
-    "file": "assets/Register-DLLK5m4Z.js",
+    "file": "assets/Register-CtmAnI7w.js",
     "name": "Register",
     "src": "resources/js/pages/Auth/Register.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_compiler-runtime-BE8wk9yF.js"
+      "_compiler-runtime-DsFBfS2b.js"
     ],
     "css": [
-      "assets/app-BzCSx4zY.css"
+      "assets/app-iB3O1KR7.css"
     ]
   },
   "resources/js/pages/Dashboard.tsx": {
-    "file": "assets/Dashboard-C2Vf4o9o.js",
+    "file": "assets/Dashboard-DP1pc4Ng.js",
     "name": "Dashboard",
     "src": "resources/js/pages/Dashboard.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_Navbar-DB_5wZFl.js",
-      "_useTranslation-COeW6Ggc.js",
-      "_compiler-runtime-BE8wk9yF.js"
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js",
+      "_compiler-runtime-DsFBfS2b.js"
     ],
     "css": [
-      "assets/app-BzCSx4zY.css"
+      "assets/app-iB3O1KR7.css"
+    ]
+  },
+  "resources/js/pages/FAQ.tsx": {
+    "file": "assets/FAQ-DTAlNU7W.js",
+    "name": "FAQ",
+    "src": "resources/js/pages/FAQ.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_compiler-runtime-DsFBfS2b.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
+    ],
+    "css": [
+      "assets/app-iB3O1KR7.css"
+    ]
+  },
+  "resources/js/pages/Features.tsx": {
+    "file": "assets/Features-CNv0OIxQ.js",
+    "name": "Features",
+    "src": "resources/js/pages/Features.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_compiler-runtime-DsFBfS2b.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js",
+      "_UserGroupIcon-BzkrlS4j.js"
+    ],
+    "css": [
+      "assets/app-iB3O1KR7.css"
     ]
   },
   "resources/js/pages/Leaderboard/Index.tsx": {
-    "file": "assets/Index-uyvvr-bU.js",
+    "file": "assets/Index-CdGDSIyB.js",
     "name": "Index",
     "src": "resources/js/pages/Leaderboard/Index.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_compiler-runtime-BE8wk9yF.js",
-      "_Navbar-DB_5wZFl.js",
-      "_useTranslation-COeW6Ggc.js"
+      "_compiler-runtime-DsFBfS2b.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
     ],
     "css": [
-      "assets/app-BzCSx4zY.css"
+      "assets/app-iB3O1KR7.css"
     ]
   },
   "resources/js/pages/Lobby.tsx": {
-    "file": "assets/Lobby-M9kb6Kv4.js",
+    "file": "assets/Lobby-YdWSuW_3.js",
     "name": "Lobby",
     "src": "resources/js/pages/Lobby.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_compiler-runtime-BE8wk9yF.js",
-      "_ChannelProvider-DJDLJJzD.js",
-      "_Navbar-DB_5wZFl.js",
-      "_useTranslation-COeW6Ggc.js"
+      "_compiler-runtime-DsFBfS2b.js",
+      "_ChannelProvider-DSE01W-M.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
     ],
     "css": [
-      "assets/app-BzCSx4zY.css"
+      "assets/app-iB3O1KR7.css"
+    ]
+  },
+  "resources/js/pages/Pricing.tsx": {
+    "file": "assets/Pricing-CWLE8iwE.js",
+    "name": "Pricing",
+    "src": "resources/js/pages/Pricing.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_compiler-runtime-DsFBfS2b.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
+    ],
+    "css": [
+      "assets/app-iB3O1KR7.css"
+    ]
+  },
+  "resources/js/pages/Privacy.tsx": {
+    "file": "assets/Privacy-QGoTdf0e.js",
+    "name": "Privacy",
+    "src": "resources/js/pages/Privacy.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_compiler-runtime-DsFBfS2b.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
+    ],
+    "css": [
+      "assets/app-iB3O1KR7.css"
     ]
   },
   "resources/js/pages/Profile/Show.tsx": {
-    "file": "assets/Show-BoSwpg80.js",
+    "file": "assets/Show-DkCkZqFZ.js",
     "name": "Show",
     "src": "resources/js/pages/Profile/Show.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_compiler-runtime-BE8wk9yF.js",
-      "_Navbar-DB_5wZFl.js",
-      "_useTranslation-COeW6Ggc.js"
+      "_compiler-runtime-DsFBfS2b.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
     ],
     "css": [
-      "assets/app-BzCSx4zY.css"
+      "assets/app-iB3O1KR7.css"
+    ]
+  },
+  "resources/js/pages/Terms.tsx": {
+    "file": "assets/Terms-C9ikDLxD.js",
+    "name": "Terms",
+    "src": "resources/js/pages/Terms.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.tsx",
+      "_compiler-runtime-DsFBfS2b.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js"
+    ],
+    "css": [
+      "assets/app-iB3O1KR7.css"
     ]
   },
   "resources/js/pages/welcome.tsx": {
-    "file": "assets/welcome-DKkXemFu.js",
+    "file": "assets/welcome-CzWyEWPS.js",
     "name": "welcome",
     "src": "resources/js/pages/welcome.tsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.tsx",
-      "_compiler-runtime-BE8wk9yF.js",
-      "_Navbar-DB_5wZFl.js",
-      "_useTranslation-COeW6Ggc.js"
+      "_compiler-runtime-DsFBfS2b.js",
+      "_Navbar-DzcdfMEv.js",
+      "_ThemeSwitcher-DF4ydx8B.js",
+      "_UserGroupIcon-BzkrlS4j.js"
     ],
     "css": [
-      "assets/app-BzCSx4zY.css"
+      "assets/app-iB3O1KR7.css"
     ]
   }
 }

@@ -1,11 +1,12 @@
 import { jsxs, jsx } from "react/jsx-runtime";
 import { usePage, useForm, Head } from "@inertiajs/react";
-import { N as Navbar } from "./Navbar-Dm214FRo.js";
+import { N as Navbar } from "./Navbar-Cd4pwKEw.js";
 import { useTranslation } from "react-i18next";
 import "react";
 import "@headlessui/react";
 import "@heroicons/react/20/solid";
 import "@heroicons/react/24/outline";
+import "./ThemeSwitcher-C4YGyEOA.js";
 function Profile({ status }) {
   const { t } = useTranslation();
   const user = usePage().props.auth.user;

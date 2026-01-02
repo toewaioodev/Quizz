@@ -74,5 +74,97 @@
         "feature_community_desc": "Global",
         "footer": "Made with ❤️ for Quiz Lovers",
         "welcome_title": "Welcome to Quizz"
-    }
+    },
+    "about": {
+        "title": "About Quizz",
+        "description": "Quizz is the ultimate platform for knowledge enthusiasts. We combine real-time technology with AI to create a unique and competitive quiz experience. Whether you want to challenge friends, climb the leaderboards, or just learn something new, Quizz is the place for you.",
+        "mission_title": "Our Mission",
+        "mission_desc": "To make learning fun and accessible to everyone, everywhere through the power of gamification and community.",
+        "team_title": "The Team",
+        "team_desc": "We are a passionate team of developers, designers, and trivia buffs dedicated to building the best quiz experience on the web."
+    },
+    "features": {
+        "title": "Why Choose Quizz?",
+        "subtitle": "Discover the tools that make us the best platform for competitive learning.",
+        "realtime_title": "Real-time Battles",
+        "realtime_desc": "Experience lag-free 1v1 battles with players across the globe using our advanced WebSocket infrastructure.",
+        "ai_title": "AI Generation",
+        "ai_desc": "Never play the same quiz twice. Our AI generates unique questions on any topic you can imagine.",
+        "competitive_title": "Competitive Rankings",
+        "competitive_desc": "Climb the ELO-based matchmaking ladder and earn your spot among the top players.",
+        "community_title": "Vibrant Community",
+        "community_desc": "Join thousands of active players, participate in tournaments, and make new friends.",
+        "global_title": "Global Reach",
+        "global_desc": "Questions available in multiple languages, connecting knowledge seekers worldwide.",
+        "stats_title": "Detailed Statistics",
+        "stats_desc": "Track your progress with in-depth analytics on your performance across different categories."
+    },
+    "pricing": {
+        "title": "Simple Pricing",
+        "subtitle": "Start for free, upgrade for more power.",
+        "month": "mo",
+        "free_name": "Free",
+        "free_price": "$0",
+        "free_cta": "Get Started",
+        "free_feature_1": "Unlimited Standard Games",
+        "free_feature_2": "Access to Leaderboards",
+        "free_feature_3": "Basic Stats",
+        "free_feature_4": "Community Support",
+        "pro_name": "Pro",
+        "pro_price": "$9",
+        "pro_cta": "Upgrade Now",
+        "pro_feature_1": "Everything in Free",
+        "pro_feature_2": "Unlimited AI Quizzes",
+        "pro_feature_3": "Advanced Analytics",
+        "pro_feature_4": "Priority Support",
+        "team_name": "Team",
+        "team_price": "$29",
+        "team_cta": "Contact Sales",
+        "team_feature_1": "Everything in Pro",
+        "team_feature_2": "Custom Organization Leagues",
+        "team_feature_3": "Team Analytics",
+        "team_feature_4": "Dedicated Account Manager"
+    },
+    "faq": {
+        "title": "Frequently Asked Questions",
+        "subtitle": "Everything you need to know about the product and billing.",
+        "q1": "Is Quizz free to play?",
+        "a1": "Yes! You can play unlimited standard games and participate in leaderboards for free.",
+        "q2": "How does the AI quiz generation work?",
+        "a2": "We use advanced large language models to generate unique questions based on your chosen topic and difficulty.",
+        "q3": "Can I play with my friends?",
+        "a3": "Absolutely. You can create private lobbies and invite your friends to compete directly.",
+        "q4": "How is my rating calculated?",
+        "a4": "We use a modification of the ELO rating system. Winning against higher-rated players grants more points.",
+        "q5": "Do you offer student discounts?",
+        "a5": "Yes, verified students can get 50% off the Pro plan. Contact support for details."
+    },
+    "privacy": {
+        "title": "Privacy Policy",
+        "section1_title": "Data Collection",
+        "section1_content": "We collect information you provide directly to us when you create an account, such as your name, email address, and profile information. We also automatically collect certain information when you use our services, including your IP address and device information.",
+        "section2_title": "Usage of Information",
+        "section2_content": "We use the information we collect to provide, maintain, and improve our services, to process your transactions, giving you a personalized experience, and to communicate with you.",
+        "section3_title": "Data Sharing",
+        "section3_content": "We do not share your personal information with third parties except as described in this policy, such as when required by law or to protect our rights.",
+        "last_updated": "Last Updated"
+    },
+    "terms": {
+        "title": "Terms of Service",
+        "section1_title": "Acceptance of Terms",
+        "section1_content": "By accessing or using Quizz, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the service.",
+        "section2_title": "User Accounts",
+        "section2_content": "When you create an account with us, you must provide us information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms.",
+        "section3_title": "Intellectual Property",
+        "section3_content": "The Service and its original content, features, and functionality are and will remain the exclusive property of Quizz and its licensors.",
+        "last_updated": "Last Updated"
+    },
+    "arena": {
+        "victory": "VICTORY! +50 PTS",
+        "defeat": "DEFEAT -10 PTS",
+        "draw": "DRAW",
+        "back_to_dashboard": "Back to Dashboard"
+    },
+    "OFFLINE": "OFFLINE",
+    "ONLINE": "ONLINE"
 }

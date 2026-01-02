@@ -1,11 +1,12 @@
 import { jsxs, jsx } from "react/jsx-runtime";
 import { usePage, Head, Link } from "@inertiajs/react";
 import { useTranslation } from "react-i18next";
-import { N as Navbar } from "./Navbar-Dm214FRo.js";
+import { N as Navbar } from "./Navbar-Cd4pwKEw.js";
 import "react";
 import "@headlessui/react";
 import "@heroicons/react/20/solid";
 import "@heroicons/react/24/outline";
+import "./ThemeSwitcher-C4YGyEOA.js";
 function Leaderboard({ users }) {
   const { auth } = usePage().props;
   const { t } = useTranslation();

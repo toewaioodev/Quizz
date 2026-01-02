@@ -5,10 +5,11 @@ import { AblyProvider, ChannelProvider, useChannel } from "ably/react";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { N as Navbar } from "./Navbar-Dm214FRo.js";
+import { N as Navbar } from "./Navbar-Cd4pwKEw.js";
 import "@headlessui/react";
 import "@heroicons/react/20/solid";
 import "@heroicons/react/24/outline";
+import "./ThemeSwitcher-C4YGyEOA.js";
 function LobbyPage({ ably_key }) {
   const user = usePage().props.auth.user;
   const client = new Ably.Realtime({ key: ably_key, clientId: String(user.id) });

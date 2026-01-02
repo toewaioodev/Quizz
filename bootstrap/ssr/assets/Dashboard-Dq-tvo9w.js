@@ -2,11 +2,12 @@ import { jsxs, jsx } from "react/jsx-runtime";
 import { usePage, Head, Link } from "@inertiajs/react";
 import React from "react";
 import axios from "axios";
-import { N as Navbar } from "./Navbar-Dm214FRo.js";
+import { N as Navbar } from "./Navbar-Cd4pwKEw.js";
 import { useTranslation } from "react-i18next";
 import "@headlessui/react";
 import "@heroicons/react/20/solid";
 import "@heroicons/react/24/outline";
+import "./ThemeSwitcher-C4YGyEOA.js";
 function Dashboard({ categoryCounts }) {
   const { t, i18n } = useTranslation();
   const user = usePage().props.auth.user;
@@ -29,7 +30,7 @@ function Dashboard({ categoryCounts }) {
         topic: catId,
         difficulty: user.settings?.difficulty || "medium",
         // Use user preference or default
-        language: i18n.language
+        language: i18n.language ? i18n.language : "my"
         // Pass current language
       });
       setCurrentQuestion(res.data);

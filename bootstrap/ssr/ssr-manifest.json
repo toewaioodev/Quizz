@@ -1,22 +1,22 @@
 {
   "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
   "resources/js/Components/DropDown.tsx": [
-    "/build/assets/Navbar-Cd4pwKEw.js"
+    "/build/assets/Navbar-Ctort6BS.js"
   ],
   "resources/js/Components/LanguageSwitcher.tsx": [
-    "/build/assets/Navbar-Cd4pwKEw.js"
+    "/build/assets/Navbar-Ctort6BS.js"
   ],
   "resources/js/Components/Navbar.tsx": [
-    "/build/assets/Navbar-Cd4pwKEw.js"
+    "/build/assets/Navbar-Ctort6BS.js"
   ],
   "resources/js/Components/ThemeSwitcher.tsx": [
     "/build/assets/ThemeSwitcher-C4YGyEOA.js"
   ],
   "resources/js/pages/About.tsx": [
-    "/build/assets/About-C9MUe3IB.js"
+    "/build/assets/About-D0xV6Tsb.js"
   ],
   "resources/js/pages/Arena.tsx": [
-    "/build/assets/Arena-DWnaU-75.js"
+    "/build/assets/Arena-JjoUjaBj.js"
   ],
   "resources/js/pages/Auth/Login.tsx": [
     "/build/assets/Login-DBh-90dH.js"
@@ -25,34 +25,34 @@
     "/build/assets/Register-B5X3cbXJ.js"
   ],
   "resources/js/pages/Dashboard.tsx": [
-    "/build/assets/Dashboard-Dq-tvo9w.js"
+    "/build/assets/Dashboard-BDeAIlMd.js"
   ],
   "resources/js/pages/FAQ.tsx": [
-    "/build/assets/FAQ-DNt6aFLB.js"
+    "/build/assets/FAQ-EwjEe52q.js"
   ],
   "resources/js/pages/Features.tsx": [
-    "/build/assets/Features-B-fsZqVs.js"
+    "/build/assets/Features--wOZ1wOY.js"
   ],
   "resources/js/pages/Leaderboard/Index.tsx": [
-    "/build/assets/Index-B_MjSwmR.js"
+    "/build/assets/Index-BHETyuad.js"
   ],
   "resources/js/pages/Lobby.tsx": [
-    "/build/assets/Lobby-FpH6mItL.js"
+    "/build/assets/Lobby-3BDhk9Ql.js"
   ],
   "resources/js/pages/Pricing.tsx": [
-    "/build/assets/Pricing-CPmr54Wp.js"
+    "/build/assets/Pricing-CgbJKH_H.js"
   ],
   "resources/js/pages/Privacy.tsx": [
-    "/build/assets/Privacy-1KyOdZkB.js"
+    "/build/assets/Privacy-DeqGocFR.js"
   ],
   "resources/js/pages/Profile/Show.tsx": [
-    "/build/assets/Show-4njea0HC.js"
+    "/build/assets/Show-Bio6hAAc.js"
   ],
   "resources/js/pages/Terms.tsx": [
-    "/build/assets/Terms-BqUsvAFS.js"
+    "/build/assets/Terms-C9fik27f.js"
   ],
   "resources/js/pages/welcome.tsx": [
-    "/build/assets/welcome-D6vhKWSw.js"
+    "/build/assets/welcome-BGjH-ak5.js"
   ],
   "resources/js/ssr.tsx": []
 }

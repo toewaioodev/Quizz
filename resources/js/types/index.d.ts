@@ -14,6 +14,8 @@ export interface User {
     name: string;
     email: string;
     avatar?: string;
+    profile_photo_path?: string;
+    profile_photo_url?: string;
     points: number;
     wins: number;
     losses: number;

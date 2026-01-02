@@ -1,15 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { SharedData } from '../../types';
+import { SharedData, User } from '../../types';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../../Components/Navbar';
-
-interface User {
-    id: number;
-    name: string;
-    points: number;
-    wins: number;
-    losses: number;
-}
 
 export default function Leaderboard({ users }: { users: User[] }) {
     const { auth } = usePage<SharedData>().props;
@@ -64,12 +56,12 @@ export default function Leaderboard({ users }: { users: User[] }) {
                                         {index + 1}
                                     </div>
                                     <div className="col-span-5 flex items-center gap-3">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${index === 0 ? 'bg-yellow-400 text-black' :
-                                            index === 1 ? 'bg-slate-300 dark:bg-slate-400 text-black' :
-                                                index === 2 ? 'bg-orange-600 dark:bg-orange-700 text-white' :
-                                                    'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden ring-2 ${index === 0 ? 'ring-yellow-400' :
+                                                index === 1 ? 'ring-slate-300 dark:ring-slate-400' :
+                                                    index === 2 ? 'ring-orange-600 dark:ring-orange-700' :
+                                                        'ring-transparent'
                                             }`}>
-                                            {user.name.charAt(0).toUpperCase()}
+                                            <img src={user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.name}`} alt={user.name} className="w-full h-full object-cover" />
                                         </div>
                                         <span className={`font-medium ${isMe ? 'text-blue-600 dark:text-blue-400' : 'text-slate-800 dark:text-slate-200'}`}>
                                             {user.name} {isMe && '(You)'}

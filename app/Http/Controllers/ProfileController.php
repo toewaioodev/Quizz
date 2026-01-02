@@ -26,10 +26,15 @@ class ProfileController extends Controller
         $request->validate([
             'settings' => 'nullable|array',
             'settings.difficulty' => 'nullable|string|in:easy,medium,hard',
+            'photo_url' => 'nullable|url|max:2048',
         ]);
 
         $user = $request->user();
         
+        if ($request->has('photo_url')) {
+            $user->profile_photo_path = $request->input('photo_url');
+        }
+
         if ($request->has('settings')) {
             $settings = $user->settings ?? [];
             $settings = array_merge($settings, $request->input('settings'));

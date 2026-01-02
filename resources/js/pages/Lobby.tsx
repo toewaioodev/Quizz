@@ -80,7 +80,7 @@ function Lobby() {
     };
 
     return (
-        <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-slate-50 dark:bg-slate-950 p-0 text-slate-900 dark:text-white transition-colors duration-300">
+        <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-slate-50 p-0 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-white">
             <Head title="Battle Lobby" />
             <Navbar />
 
@@ -94,14 +94,14 @@ function Lobby() {
                 {/* Left Column: Actions */}
                 <div className="space-y-8 text-center md:text-left">
                     <div className="space-y-2">
-                        <h1 className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-4xl font-bold tracking-tighter text-transparent">
+                        <h1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-4xl font-bold tracking-tighter text-transparent dark:from-blue-400 dark:to-purple-400">
                             {t('Quiz Battle')}
                         </h1>
                         <p className="text-slate-600 dark:text-slate-400">{t('Compete in real-time 1v1 matches.')}</p>
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white/50 dark:bg-slate-900/50 p-6 shadow-xl backdrop-blur-xl">
-                        <div className="mb-6 flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-6">
+                    <div className="rounded-2xl border border-slate-200 bg-white/50 p-6 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/50">
+                        <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-6 dark:border-white/5">
                             <div className="text-left">
                                 <p className="text-xs font-semibold tracking-wider text-slate-500 uppercase">{t('My Rank')}</p>
                                 <p className="text-2xl font-bold">
@@ -119,20 +119,22 @@ function Lobby() {
                         <button
                             onClick={findMatch}
                             disabled={searching || (user.points || 0) < 10}
-                            className={`group relative w-full overflow-hidden rounded-xl p-[1px] transition-all ${(user.points || 0) < 10
-                                    ? 'cursor-not-allowed bg-slate-300 dark:bg-slate-700 opacity-50'
+                            className={`group relative w-full overflow-hidden rounded-xl p-[1px] transition-all ${
+                                (user.points || 0) < 10
+                                    ? 'cursor-not-allowed bg-slate-300 opacity-50 dark:bg-slate-700'
                                     : 'bg-gradient-to-r from-blue-600 to-violet-600 hover:scale-[1.02] active:scale-[0.98]'
-                                }`}
+                            }`}
                         >
                             <div
-                                className={`relative flex h-14 items-center justify-center gap-3 rounded-[11px] transition-colors ${(user.points || 0) < 10
+                                className={`relative flex h-14 items-center justify-center gap-3 rounded-[11px] transition-colors ${
+                                    (user.points || 0) < 10
                                         ? 'bg-slate-100 dark:bg-slate-900'
-                                        : 'bg-slate-50 dark:bg-slate-950/50 group-hover:bg-transparent'
-                                    }`}
+                                        : 'bg-slate-50 group-hover:bg-transparent dark:bg-slate-950/50'
+                                }`}
                             >
                                 {searching ? (
                                     <>
-                                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-400 dark:border-white/30 border-t-slate-800 dark:border-t-white" />
+                                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-400 border-t-slate-800 dark:border-white/30 dark:border-t-white" />
                                         <span className="font-semibold tracking-wide text-slate-800 dark:text-white">{t('Finding Match...')}</span>
                                     </>
                                 ) : (user.points || 0) < 10 ? (
@@ -145,7 +147,9 @@ function Lobby() {
                                                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                                             />
                                         </svg>
-                                        <span className="text-lg font-semibold tracking-wide text-slate-500 dark:text-slate-400">{t('Need 10 Points')}</span>
+                                        <span className="text-lg font-semibold tracking-wide text-slate-500 dark:text-slate-400">
+                                            {t('Need 10 Points')}
+                                        </span>
                                     </>
                                 ) : (
                                     <>
@@ -162,8 +166,8 @@ function Lobby() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <button className="group rounded-xl border border-slate-200 dark:border-white/5 bg-white/50 dark:bg-slate-900/50 p-4 text-left transition-colors hover:border-purple-400/50 dark:hover:border-white/20">
-                            <div className="mb-2 origin-left text-purple-600 dark:text-purple-400 transition-transform group-hover:scale-110">
+                        <button className="group rounded-xl border border-slate-200 bg-white/50 p-4 text-left transition-colors hover:border-purple-400/50 dark:border-white/5 dark:bg-slate-900/50 dark:hover:border-white/20">
+                            <div className="mb-2 origin-left text-purple-600 transition-transform group-hover:scale-110 dark:text-purple-400">
                                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path
                                         strokeLinecap="round"
@@ -177,9 +181,9 @@ function Lobby() {
                         </button>
                         <Link
                             href="/leaderboard"
-                            className="group rounded-xl border border-slate-200 dark:border-white/5 bg-white/50 dark:bg-slate-900/50 p-4 text-left transition-colors hover:border-blue-400/50 dark:hover:border-white/20"
+                            className="group rounded-xl border border-slate-200 bg-white/50 p-4 text-left transition-colors hover:border-blue-400/50 dark:border-white/5 dark:bg-slate-900/50 dark:hover:border-white/20"
                         >
-                            <div className="mb-2 origin-left text-blue-600 dark:text-blue-400 transition-transform group-hover:scale-110">
+                            <div className="mb-2 origin-left text-blue-600 transition-transform group-hover:scale-110 dark:text-blue-400">
                                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path
                                         strokeLinecap="round"
@@ -195,7 +199,7 @@ function Lobby() {
                 </div>
 
                 {/* Right Column: Active Players */}
-                <div className="h-full min-h-[400px] rounded-2xl border border-slate-200 dark:border-white/5 bg-white/30 dark:bg-slate-900/30 p-6 backdrop-blur-md">
+                <div className="h-full min-h-[400px] rounded-2xl border border-slate-200 bg-white/30 p-6 backdrop-blur-md dark:border-white/5 dark:bg-slate-900/30">
                     <h2 className="mb-4 flex items-center text-xl font-bold text-slate-800 dark:text-white">
                         <span className="mr-2 h-2 w-2 animate-pulse rounded-full bg-green-500"></span>
                         {t('Active Players')} ({activeUsers.length})
@@ -205,14 +209,21 @@ function Lobby() {
                         {activeUsers.map((p: any) => (
                             <div
                                 key={p.clientId}
-                                className="flex items-center space-x-3 rounded-lg border border-slate-200 dark:border-white/5 bg-white/40 dark:bg-white/5 p-3 transition-colors hover:bg-white/60 dark:hover:bg-white/10"
+                                className="flex items-center space-x-3 rounded-lg border border-slate-200 bg-white/40 p-3 transition-colors hover:bg-white/60 dark:border-white/5 dark:bg-white/5 dark:hover:bg-white/10"
                             >
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-blue-500 to-teal-500 text-sm font-bold shadow-sm text-white">
+                                {/* <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-blue-500 to-teal-500 text-sm font-bold text-white shadow-sm">
                                     {p.data.name.charAt(0)}
-                                </div>
+                                </div> */}
+                                <img
+                                    src={user.profile_photo_url}
+                                    alt={user.name}
+                                    className="h-10 w-10 rounded-full object-cover ring-2 ring-white/20"
+                                />
+
                                 <div className="flex-1">
                                     <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                        {p.data.name} {p.data.id == user.id && <span className="text-green-600 dark:text-green-400">({t('You')})</span>}
+                                        {p.data.name}{' '}
+                                        {p.data.id == user.id && <span className="text-green-600 dark:text-green-400">({t('You')})</span>}
                                     </p>
                                     <p className="text-xs text-slate-500">{t('Online')}</p>
                                 </div>

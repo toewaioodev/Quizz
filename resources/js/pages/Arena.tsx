@@ -217,8 +217,8 @@ function Arena({ match }: { match: any }) {
                 {/* Player 1 (You) */}
                 <div className={`flex items-center gap-3 transition-all duration-300 ${score > opponentScore ? 'scale-105' : 'scale-100'}`}>
                     <div className="relative">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-500 to-blue-700 text-lg font-bold text-white shadow-lg shadow-blue-500/30 md:h-16 md:w-16 md:text-xl dark:border-slate-800">
-                            {user.name.charAt(0)}
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-500 to-blue-700 text-lg font-bold text-white shadow-lg shadow-blue-500/30 md:h-16 md:w-16 md:text-xl dark:border-slate-800 overflow-hidden">
+                            <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="absolute -right-1 -bottom-1 rounded-full border border-white bg-slate-900 px-1.5 py-0.5 text-[10px] font-bold text-white md:text-xs dark:border-slate-800">
                             YOU
@@ -263,7 +263,7 @@ function Arena({ match }: { match: any }) {
                         </div>
                     ) : (
                         <div className="text-2xl font-black text-slate-300 italic md:text-4xl dark:text-slate-700">
-                            {gameState === 'starting' ? 'VS' : gameState === 'waiting' ? t('WAITING') : gameState === 'result' ? t('GAME OVER') : ''}
+                            {gameState === 'starting' ? 'VS' : gameState === 'waiting' ? t('WAITING') : ''}
                         </div>
                     )}
                     <div className="mt-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase md:text-xs">
@@ -277,9 +277,11 @@ function Arena({ match }: { match: any }) {
                 >
                     <div className="relative">
                         <div
-                            className={`flex h-12 w-12 items-center justify-center rounded-full border-2 border-white text-lg font-bold text-white shadow-lg md:h-16 md:w-16 md:text-xl dark:border-slate-800 ${opponent ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-red-500/30' : 'animate-pulse bg-slate-300 dark:bg-slate-800'}`}
+                            className={`flex h-12 w-12 items-center justify-center rounded-full border-2 border-white text-lg font-bold text-white shadow-lg md:h-16 md:w-16 md:text-xl dark:border-slate-800 overflow-hidden ${opponent ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-red-500/30' : 'animate-pulse bg-slate-300 dark:bg-slate-800'}`}
                         >
-                            {opponent ? (opponent.name ? opponent.name.charAt(0) : '?') : '?'}
+                            {opponent ? (
+                                <img src={opponent.profile_photo_url || `https://ui-avatars.com/api/?name=${opponent.name}&color=7F9CF5&background=EBF4FF`} alt={opponent.name} className="w-full h-full object-cover" />
+                            ) : '?'}
                         </div>
                         {/* Presence Dot */}
                         {opponent && (
@@ -292,7 +294,6 @@ function Arena({ match }: { match: any }) {
                         <span className="max-w-[80px] truncate text-sm font-bold md:max-w-[150px] md:text-lg">
                             {opponent ? opponent.name : t('...')}
                         </span>
-                        {/* {!opponentPresent || opponent && <span className="text-[10px] font-bold text-red-500 uppercase">{t('ONLINE')}</span>} */}
                         <span className="text-xl leading-none font-black text-red-500 md:text-3xl dark:text-red-400">{opponentScore}</span>
                     </div>
                 </div>
@@ -360,13 +361,12 @@ function Arena({ match }: { match: any }) {
                                             key={idx}
                                             onClick={() => handleAnswer(opt)}
                                             disabled={hasAnswered}
-                                            className={`group relative rounded-2xl border-2 p-4 text-left transition-all duration-200 md:p-6 ${
-                                                hasAnswered
-                                                    ? opt === currentQuestion.correct_answer
-                                                        ? 'scale-[1.02] border-green-600 bg-green-500 text-white shadow-lg shadow-green-500/20'
-                                                        : 'border-transparent bg-slate-100 text-slate-400 opacity-50 dark:bg-slate-800/50'
-                                                    : 'border-slate-200 bg-white text-slate-700 hover:-translate-y-1 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/10 active:translate-y-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
-                                            } `}
+                                            className={`group relative rounded-2xl border-2 p-4 text-left transition-all duration-200 md:p-6 ${hasAnswered
+                                                ? opt === currentQuestion.correct_answer
+                                                    ? 'scale-[1.02] border-green-600 bg-green-500 text-white shadow-lg shadow-green-500/20'
+                                                    : 'border-transparent bg-slate-100 text-slate-400 opacity-50 dark:bg-slate-800/50'
+                                                : 'border-slate-200 bg-white text-slate-700 hover:-translate-y-1 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/10 active:translate-y-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200'
+                                                } `}
                                         >
                                             <div className="flex items-center gap-3">
                                                 <span
@@ -397,8 +397,8 @@ function Arena({ match }: { match: any }) {
                                 >
                                     <div className="relative">
                                         {score > opponentScore && <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-4xl">👑</div>}
-                                        <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-blue-600 text-3xl font-bold shadow-xl md:h-24 md:w-24 dark:border-slate-800">
-                                            {user.name.charAt(0)}
+                                        <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-blue-600 text-3xl font-bold shadow-xl md:h-24 md:w-24 dark:border-slate-800 overflow-hidden">
+                                            <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
                                         </div>
                                         <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-2 py-1 text-xs font-bold text-white">
                                             YOU
@@ -416,8 +416,10 @@ function Arena({ match }: { match: any }) {
                                 >
                                     <div className="relative">
                                         {opponentScore > score && <div className="absolute -top-10 left-1/2 -translate-x-1/2 text-4xl">👑</div>}
-                                        <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-red-600 text-3xl font-bold shadow-xl md:h-24 md:w-24 dark:border-slate-800">
-                                            {opponent ? opponent.name.charAt(0) : '?'}
+                                        <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-red-600 text-3xl font-bold shadow-xl md:h-24 md:w-24 dark:border-slate-800 overflow-hidden">
+                                            {opponent ? (
+                                                <img src={opponent.profile_photo_url || `https://ui-avatars.com/api/?name=${opponent.name}&color=7F9CF5&background=EBF4FF`} alt={opponent.name} className="w-full h-full object-cover" />
+                                            ) : '?'}
                                         </div>
                                     </div>
                                     <div className="pt-2 text-center">

@@ -1,12 +1,12 @@
+import { Dialog, DialogPanel } from '@headlessui/react';
+import { ArrowRightOnRectangleIcon, Bars3Icon, ChevronDownIcon, UserIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Link, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SharedData } from '../types';
+import Dropdown from './DropDown';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeSwitcher from './ThemeSwitcher';
-import { useTranslation } from 'react-i18next';
-import Dropdown from './DropDown';
-import { ChevronDownIcon, UserIcon, ArrowRightOnRectangleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
-import { Dialog, DialogPanel } from '@headlessui/react';
 
 export default function Navbar() {
     const { auth } = usePage<SharedData>().props;
@@ -14,59 +14,62 @@ export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <header className="bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 w-full backdrop-blur-md transition-colors duration-300">
-            <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
-
+        <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900/80">
+            <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo & Brand */}
-                <Link href="/lobby" className="flex items-center space-x-3 group">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
+                <Link href="/lobby" className="group flex items-center space-x-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 text-xl font-bold text-white shadow-lg shadow-blue-500/20 transition-transform group-hover:scale-105">
                         Q
                     </div>
-                    <span className="font-extrabold text-xl tracking-tight text-slate-800 dark:text-white">
-                        Quizz
-                    </span>
+                    <span className="text-xl font-extrabold tracking-tight text-slate-800 dark:text-white">Quizz</span>
                 </Link>
 
                 {/* Desktop Right Side Actions */}
-                <div className="hidden md:flex items-center space-x-4">
+                <div className="hidden items-center space-x-4 md:flex">
                     <ThemeSwitcher />
                     <LanguageSwitcher />
 
                     {/* Divider */}
-                    <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+                    <div className="hidden h-6 w-px bg-slate-200 sm:block dark:bg-slate-700"></div>
 
                     {/* User Profile */}
                     {auth.user ? (
                         <Dropdown>
                             <Dropdown.Trigger>
-                                <button className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus:outline-none">
-                                    <div className="cursor-pointer w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 flex items-center justify-center text-xs font-bold text-white shadow-md ring-2 ring-white/20">
-                                        {auth.user.name.charAt(0)}
+                                <button className="flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600 focus:outline-none dark:text-gray-200 dark:hover:text-indigo-400">
+                                    <div className="flex h-8 w-8 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 text-xs font-bold text-white shadow-md ring-2 ring-white/20">
+                                        <img src={auth.user.profile_photo_url} alt={auth.user.name} className="h-full w-full object-cover" />
                                     </div>
-                                    <ChevronDownIcon className="hidden sm:block w-4 h-4" />
+                                    <ChevronDownIcon className="hidden h-4 w-4 sm:block" />
                                 </button>
                             </Dropdown.Trigger>
 
-                            <Dropdown.Content width="48" contentClasses="py-1 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-xl rounded-xl">
-                                <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                            <Dropdown.Content
+                                width="48"
+                                contentClasses="py-1 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-xl rounded-xl"
+                            >
+                                <div className="border-b border-gray-100 px-4 py-3 dark:border-gray-700">
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Signed in as</p>
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{auth.user.email}</p>
+                                    <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{auth.user.email}</p>
                                 </div>
 
-                                <Dropdown.Link href="/profile" className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                    <UserIcon className="w-4 h-4 mr-2" />
+                                <Dropdown.Link
+                                    href="/profile"
+                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700/50"
+                                >
+                                    <UserIcon className="mr-2 h-4 w-4" />
                                     Profile
                                 </Dropdown.Link>
 
-                                <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
+                                <div className="my-1 border-t border-gray-100 dark:border-gray-700" />
 
                                 <Dropdown.Link
                                     href="/logout"
                                     method="post"
                                     as="button"
-                                    className="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left"
+                                    className="flex w-full items-center px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                                 >
-                                    <ArrowRightOnRectangleIcon className="w-4 h-4 mr-2" />
+                                    <ArrowRightOnRectangleIcon className="mr-2 h-4 w-4" />
                                     Log Out
                                 </Dropdown.Link>
                             </Dropdown.Content>
@@ -75,13 +78,13 @@ export default function Navbar() {
                         <div className="flex items-center gap-3">
                             <Link
                                 href="/login"
-                                className="px-5 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                                className="px-5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:text-purple-600 dark:text-slate-200 dark:hover:text-purple-400"
                             >
                                 Log in
                             </Link>
                             <Link
                                 href="/register"
-                                className="px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 hover:scale-105 transition-all duration-200"
+                                className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition-all duration-200 hover:scale-105 hover:shadow-blue-500/40"
                             >
                                 Register
                             </Link>
@@ -90,7 +93,10 @@ export default function Navbar() {
                 </div>
 
                 {/* Mobile Menu Button */}
-                <div className="flex md:hidden">
+                <div className="flex gap-3 md:hidden items-center">
+                    <LanguageSwitcher />
+                    <ThemeSwitcher />
+
                     <button
                         type="button"
                         className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-gray-200"
@@ -105,13 +111,13 @@ export default function Navbar() {
             {/* Mobile Sidebar Dialog */}
             <Dialog as="div" className="md:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
                 <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm dark:bg-black/50" />
-                <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white dark:bg-slate-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 transition-transform duration-300 ease-in-out">
+                <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 transition-transform duration-300 ease-in-out sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 dark:bg-slate-900">
                     <div className="flex items-center justify-between">
-                        <Link href="/lobby" className="flex items-center space-x-3 -m-1.5 p-1.5">
-                            <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                        <Link href="/lobby" className="-m-1.5 flex items-center space-x-3 p-1.5">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-tr from-blue-600 to-purple-600 text-lg font-bold text-white">
                                 Q
                             </div>
-                            <span className="font-bold text-lg text-slate-800 dark:text-white">Quizz</span>
+                            <span className="text-lg font-bold text-slate-800 dark:text-white">Quizz</span>
                         </Link>
                         <button
                             type="button"
@@ -129,23 +135,23 @@ export default function Navbar() {
                                 {/* Add main nav links here if any were hidden on desktop, currently most are actions */}
                             </div>
 
-                            <div className="py-6 space-y-4">
+                            <div className="space-y-4 py-6">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-base font-semibold leading-7 text-gray-900 dark:text-white">Appearance</span>
+                                    <span className="text-base leading-7 font-semibold text-gray-900 dark:text-white">Appearance</span>
                                     <ThemeSwitcher />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-base font-semibold leading-7 text-gray-900 dark:text-white">Language</span>
+                                    <span className="text-base leading-7 font-semibold text-gray-900 dark:text-white">Language</span>
                                     <LanguageSwitcher />
                                 </div>
 
-                                <div className="border-t border-gray-200 dark:border-gray-700 my-4" />
+                                <div className="my-4 border-t border-gray-200 dark:border-gray-700" />
 
                                 {auth.user ? (
                                     <>
                                         <div className="flex items-center gap-3 px-3 py-2">
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 flex items-center justify-center text-sm font-bold text-white shadow-md ring-2 ring-white/20">
-                                                {auth.user.name.charAt(0)}
+                                            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-tr from-yellow-400 to-orange-500 text-sm font-bold text-white shadow-md ring-2 ring-white/20">
+                                                <img src={auth.user.profile_photo_url} alt={auth.user.name} className="h-full w-full object-cover" />
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-semibold text-gray-900 dark:text-white">{auth.user.name}</span>
@@ -154,7 +160,7 @@ export default function Navbar() {
                                         </div>
                                         <Link
                                             href="/profile"
-                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base leading-7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800"
                                         >
                                             Profile
                                         </Link>
@@ -162,7 +168,7 @@ export default function Navbar() {
                                             href="/logout"
                                             method="post"
                                             as="button"
-                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 w-full text-left"
+                                            className="-mx-3 block w-full rounded-lg px-3 py-2.5 text-left text-base leading-7 font-semibold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/10"
                                         >
                                             Log out
                                         </Link>
@@ -171,13 +177,13 @@ export default function Navbar() {
                                     <div className="flex flex-col gap-3">
                                         <Link
                                             href="/login"
-                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                            className="-mx-3 block rounded-lg px-3 py-2.5 text-base leading-7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800"
                                         >
                                             Log in
                                         </Link>
                                         <Link
                                             href="/register"
-                                            className="block w-full text-center rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-3 py-2.5 text-base font-semibold leading-7 text-white shadow-lg hover:shadow-xl transition-all"
+                                            className="block w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-3 py-2.5 text-center text-base leading-7 font-semibold text-white shadow-lg transition-all hover:shadow-xl"
                                         >
                                             Register
                                         </Link>

@@ -14,7 +14,7 @@ class LeaderboardController extends Controller
         $users = User::orderByDesc('points')
             ->orderByDesc('wins')
             ->take(10)
-            ->get(['id', 'name', 'points', 'wins', 'losses']);
+            ->get(['id', 'name', 'points', 'wins', 'losses', 'profile_photo_path']);
 
         return Inertia::render('Leaderboard/Index', [
             'users' => $users

@@ -40,7 +40,33 @@ class User extends Authenticatable
         'wins',
         'losses',
         'settings',
+        'profile_photo_path',
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'profile_photo_url',
+    ];
+
+    /**
+     * Get the URL to the user's profile photo.
+     *
+     * @return string
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->profile_photo_path) {
+            return str_starts_with($this->profile_photo_path, 'https')
+                ? $this->profile_photo_path
+                : url('storage/' . $this->profile_photo_path);
+        }
+
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&color=7F9CF5&background=EBF4FF';
+    }
 
     /**
      * The attributes that should be hidden for serialization.

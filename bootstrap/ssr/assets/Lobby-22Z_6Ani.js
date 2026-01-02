@@ -32,7 +32,7 @@ function Lobby() {
         console.error("Error fetching presence:", err);
       }
     };
-    channel.presence.enter({ name: user.name, id: user.id });
+    channel.presence.enter({ name: user.name, id: user.id, profile_photo_url: user.profile_photo_url });
     channel.presence.subscribe("enter", updateMembers);
     channel.presence.subscribe("leave", updateMembers);
     channel.presence.subscribe("update", updateMembers);
@@ -176,8 +176,8 @@ function Lobby() {
                 /* @__PURE__ */ jsx(
                   "img",
                   {
-                    src: user.profile_photo_url,
-                    alt: user.name,
+                    src: p.data.profile_photo_url || `https://ui-avatars.com/api/?name=${p.data.name}`,
+                    alt: p.data.name,
                     className: "h-10 w-10 rounded-full object-cover ring-2 ring-white/20"
                   }
                 ),

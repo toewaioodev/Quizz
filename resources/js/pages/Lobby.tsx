@@ -46,7 +46,7 @@ function Lobby() {
         };
 
         // Enter presence
-        channel.presence.enter({ name: user.name, id: user.id });
+        channel.presence.enter({ name: user.name, id: user.id, profile_photo_url: user.profile_photo_url });
 
         // Subscribe to changes
         channel.presence.subscribe('enter', updateMembers);
@@ -215,8 +215,8 @@ function Lobby() {
                                     {p.data.name.charAt(0)}
                                 </div> */}
                                 <img
-                                    src={user.profile_photo_url}
-                                    alt={user.name}
+                                    src={p.data.profile_photo_url || `https://ui-avatars.com/api/?name=${p.data.name}`}
+                                    alt={p.data.name}
                                     className="h-10 w-10 rounded-full object-cover ring-2 ring-white/20"
                                 />
 

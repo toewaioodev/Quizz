@@ -6,6 +6,8 @@ use App\Models\QuizMatch;
 use App\Services\AblyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -13,11 +15,16 @@ class GameController extends Controller
 {
     protected $ablyService;
     protected $gameStateService;
+    protected $matchmakingService;
 
-    public function __construct(AblyService $ablyService, \App\Services\GameStateService $gameStateService)
-    {
+    public function __construct(
+        AblyService $ablyService, 
+        \App\Services\GameStateService $gameStateService,
+        \App\Services\MatchmakingService $matchmakingService
+    ) {
         $this->ablyService = $ablyService;
         $this->gameStateService = $gameStateService;
+        $this->matchmakingService = $matchmakingService;
     }
 
     public function lobby()
@@ -35,80 +42,35 @@ class GameController extends Controller
         if ($user->points < 10) {
             return response()->json(['message' => 'You need at least 10 points to battle.'], 403);
         }
+
+        // Delegate to Service
+        $result = $this->matchmakingService->findOrCreateMatch($user);
         
-        // Use an atomic lock to ensure only one person is "Matchmaking" at a time
-        // This prevents the race condition where 2 people check "pending" -> find nothing -> both create
-        $lock = \Illuminate\Support\Facades\Cache::lock('matchmaking_lock', 10);
-
-        try {
-            // Block until lock is acquired (wait up to 5s)
-            $lock->block(5);
-
-            // 1. Search for an available match
-            $pendingMatch = QuizMatch::where('status', 'pending')
-                ->where('player1_id', '!=', $user->id)
-                ->where('updated_at', '>=', now()->subMinute())
-                ->lockForUpdate() // Still good to lock the row if found
-                ->first();
-
-            if ($pendingMatch) {
-                $pendingMatch->update([
-                    'player2_id' => $user->id,
-                    'status' => 'pending_start', 
-                ]);
-                
-                $this->ablyService->publish(
-                    "match:{$pendingMatch->channel_id}", 
-                    'match-found', 
-                    [
-                        'match_id' => $pendingMatch->id,
-                        'opponent' => $user 
-                    ]
-                );
-                
-                // Release lock immediately so others can proceed (e.g. creating their own matches if full)
-                $lock->release();
-
-                return response()->json(['match_id' => $pendingMatch->id, 'channel_id' => $pendingMatch->channel_id, 'role' => 'player2']);
-            } else {
-                // 2. No match found, create one
-                // Check if I already have a pending match to avoid spam?
-                // Optional optimization: remove my old pending matches
-                QuizMatch::where('player1_id', $user->id)
-                    ->where('status', 'pending')
-                    ->update(['status' => 'cancelled']);
-
-                $match = QuizMatch::create([
-                    'player1_id' => $user->id,
-                    'status' => 'pending',
-                    'channel_id' => Str::uuid(),
-                ]);
-                
-                $lock->release();
-
-                return response()->json(['match_id' => $match->id, 'channel_id' => $match->channel_id, 'role' => 'player1']);
-            }
-
-        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
-            return response()->json(['message' => 'Matchmaking is busy, please try again.'], 429);
-        } catch (\Exception $e) {
-             optional($lock)->release();
-             throw $e;
-        }
+        return response()->json($result);
     }
 
     public function startMatch(Request $request, $id)
     {
+        Log::info("startMatch called for Match ID: $id by User: " . $request->user()->id);
         $match = QuizMatch::findOrFail($id);
         
         // Security: only allow if user is part of the match
         if ($match->player1_id !== $request->user()->id && $match->player2_id !== $request->user()->id) {
+            Log::warning("Unauthorized start attempt for Match $id");
             abort(403);
         }
 
         // Only start if not already active to avoid resets
         if ($match->status !== 'active') {
-             $this->gameStateService->startGame($match);
+             Log::info("Starting Game via Service for Match $id");
+             try {
+                $this->gameStateService->startGame($match);
+             } catch (\Exception $e) {
+                 Log::error("Failed to start game: " . $e->getMessage());
+                 return response()->json(['error' => $e->getMessage()], 500);
+             }
+        } else {
+             Log::info("Match $id already active, skipping start.");
         }
 
         return response()->json(['status' => 'started']);

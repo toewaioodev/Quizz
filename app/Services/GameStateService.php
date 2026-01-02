@@ -6,6 +6,7 @@ use App\Models\QuizMatch;
 use App\Models\Question;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class GameStateService
 {
@@ -18,9 +19,17 @@ class GameStateService
 
     public function startGame(QuizMatch $match)
     {
+        Log::info("GameStateService: startGame for Match {$match->id}");
         // 1. Select 5 random questions
         // Ideally we pick based on user preference or random
         $questions = Question::inRandomOrder()->limit(5)->get();
+        Log::info("Selected " . $questions->count() . " questions.");
+        
+        if ($questions->isEmpty()) {
+            Log::error("No questions found in database!");
+            return;
+        }
+
         $questionIds = $questions->pluck('id')->toArray();
 
         // 2. Initialize Match State
@@ -51,6 +60,7 @@ class GameStateService
         );
 
         // 4. Send First Question (after small delay or immediately)
+        Log::info("Sending first question...");
         $this->sendQuestion($match, $questions->first(), 0);
     }
 

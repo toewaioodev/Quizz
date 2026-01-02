@@ -119,11 +119,8 @@ export function useGameEngine(matchId: number, channelId: string, userId: number
         switch (message.name) {
             case 'match-found':
                 dispatch({ type: 'MATCH_FOUND', payload: message.data });
-                // If host, trigger start after delay? Or manual?
-                // For now, let's assume Host triggers start automatically or via button
-                if (isHost) {
-                    setTimeout(() => startGame(), 2000);
-                }
+                // Server now auto-starts the match immediately upon joining
+                // So we just update state and wait for match:start
                 break;
             case 'match:start':
                 dispatch({ type: 'GAME_START', payload: message.data });

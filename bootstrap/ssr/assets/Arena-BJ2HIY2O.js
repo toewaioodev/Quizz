@@ -70,9 +70,6 @@ function useGameEngine(matchId, channelId, userId, isHost) {
     switch (message.name) {
       case "match-found":
         dispatch({ type: "MATCH_FOUND", payload: message.data });
-        if (isHost) {
-          setTimeout(() => startGame(), 2e3);
-        }
         break;
       case "match:start":
         dispatch({ type: "GAME_START", payload: message.data });

@@ -57,12 +57,12 @@ export default function Dashboard({ categoryCounts }: { categoryCounts: Record<s
     };
 
     const categories = [
-        { id: 'math', name: 'Mathematics', icon: '📐', color: 'from-blue-500 to-indigo-600', desc: 'Numbers, algebra, and geometry', image: '/images/math_bg.png' },
-        { id: 'science', name: 'Science', icon: '🧬', color: 'from-green-500 to-emerald-600', desc: 'Physics, chemistry, and biology', image: '/images/science_bg.png' },
-        { id: 'history', name: 'History', icon: '🏛️', color: 'from-orange-500 to-amber-600', desc: 'World events and civilizations', image: '/images/history_bg.png' },
-        { id: 'geo', name: 'Geography', icon: '🌍', color: 'from-teal-500 to-cyan-600', desc: 'Countries, capitals, and maps', image: '/images/geo_bg.png' },
-        { id: 'tech', name: 'Technology', icon: '💻', color: 'from-purple-500 to-violet-600', desc: 'Computers, coding, and innovations', image: '/images/tech_bg.png' },
-        { id: 'arts', name: 'Arts & Lit', icon: '🎨', color: 'from-pink-500 to-rose-600', desc: 'Paintings, books, and culture', image: '/images/arts_bg.png' },
+        { id: 'math', name: 'Mathematics', icon: '📐', color: 'from-blue-500 to-indigo-600', desc: 'Numbers, algebra, and geometry', image: '/images/math_bg.jpg' },
+        { id: 'science', name: 'Science', icon: '🧬', color: 'from-green-500 to-emerald-600', desc: 'Physics, chemistry, and biology', image: '/images/science_bg.jpg' },
+        { id: 'history', name: 'History', icon: '🏛️', color: 'from-orange-500 to-amber-600', desc: 'World events and civilizations', image: '/images/history_bg.jpg' },
+        { id: 'geo', name: 'Geography', icon: '🌍', color: 'from-teal-500 to-cyan-600', desc: 'Countries, capitals, and maps', image: '/images/geo_bg.jpg' },
+        { id: 'tech', name: 'Technology', icon: '💻', color: 'from-purple-500 to-violet-600', desc: 'Computers, coding, and innovations', image: '/images/tech_bg.jpg' },
+        { id: 'arts', name: 'Arts & Lit', icon: '🎨', color: 'from-pink-500 to-rose-600', desc: 'Paintings, books, and culture', image: '/images/arts_bg.jpg' },
     ];
 
     return (
@@ -80,7 +80,7 @@ export default function Dashboard({ categoryCounts }: { categoryCounts: Record<s
                         {/* Background Image */}
                         <div className="absolute inset-0">
                             <img
-                                src="/images/hero_bg.png"
+                                src="/images/hero_bg.jpg"
                                 alt="Battle Arena"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             />
@@ -108,7 +108,7 @@ export default function Dashboard({ categoryCounts }: { categoryCounts: Record<s
                         {/* Background Image */}
                         <div className="absolute inset-0">
                             <img
-                                src="/images/rating_bg.png"
+                                src="/images/rating_bg.jpg"
                                 alt="Rating Background"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             />

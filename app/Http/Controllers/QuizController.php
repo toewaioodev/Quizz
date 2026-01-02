@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class QuizController extends Controller
 {
@@ -23,6 +24,16 @@ class QuizController extends Controller
 
         // Filter by language
         $query->where('language', $language);
+
+        // Exclude answered questions using subquery for performance
+        $userId = $request->user()->id;
+        
+        $query->whereNotExists(function ($subquery) use ($userId) {
+            $subquery->select(DB::raw(1))
+                     ->from('user_answers')
+                     ->whereColumn('user_answers.question_id', 'questions.id')
+                     ->where('user_answers.user_id', $userId);
+        });
 
         if ($topic) {
             // Simple mapping or direct search. For now direct search.
@@ -53,6 +64,15 @@ class QuizController extends Controller
         // Fallback if no question found in selected language, try fallback to English if not already English
         if (!$question && $language !== 'en') {
              $fallbackQuery = Question::query()->where('language', 'en');
+             
+             // Also exclude answered for fallback
+             $fallbackQuery->whereNotExists(function ($subquery) use ($userId) {
+                $subquery->select(DB::raw(1))
+                         ->from('user_answers')
+                         ->whereColumn('user_answers.question_id', 'questions.id')
+                         ->where('user_answers.user_id', $userId);
+            });
+             
              if ($topic) {
                  if (isset($categoryMap[strtolower($topic)])) {
                      $fallbackQuery->where('category', $categoryMap[strtolower($topic)]);
@@ -94,6 +114,13 @@ class QuizController extends Controller
             $pointsEarned = 10;
             $user->increment('points', $pointsEarned);
         }
+
+        // Record the answer
+        \App\Models\UserAnswer::create([
+            'user_id' => $user->id,
+            'question_id' => $question->id,
+            'is_correct' => $isCorrect,
+        ]);
 
         return response()->json([
             'correct' => $isCorrect,

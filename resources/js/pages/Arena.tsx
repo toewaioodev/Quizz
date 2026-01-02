@@ -176,7 +176,7 @@ function Arena({ match }: { match: any }) {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 flex flex-col items-center font-sans selection:bg-blue-500 selection:text-white">
+        <div className="min-h-screen bg-slate-100 dark:bg-black text-slate-900 dark:text-white p-6 flex flex-col items-center font-sans selection:bg-blue-500 selection:text-white transition-colors duration-300">
             <Head title="Arena" />
 
             <div className="max-w-4xl w-full flex justify-between items-center mb-12">
@@ -215,7 +215,7 @@ function Arena({ match }: { match: any }) {
                 </div>
             </div>
 
-            <div className="w-full max-w-3xl bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-3xl p-8 min-h-[400px] flex flex-col items-center justify-center relative shadow-2xl">
+            <div className="w-full max-w-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-700/50 rounded-3xl p-8 min-h-[400px] flex flex-col items-center justify-center relative shadow-2xl transition-colors duration-300">
                 {gameState === 'waiting' && !opponent && (
                     <div className="text-center space-y-6">
                         <div className="relative">
@@ -225,26 +225,26 @@ function Arena({ match }: { match: any }) {
                             </div>
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold tracking-tight">{t('Searching for Opponent')}</h2>
-                            <p className="text-slate-400 mt-2">{t('Connecting to global matchmaking server...')}</p>
+                            <h2 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-white">{t('Searching for Opponent')}</h2>
+                            <p className="text-slate-500 dark:text-slate-400 mt-2">{t('Connecting to global matchmaking server...')}</p>
                         </div>
                     </div>
                 )}
 
                 {gameState === 'starting' && (
                     <div className="text-center space-y-4">
-                        <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 animate-bounce">{t('MATCH FOUND!')}</h1>
-                        <p className="text-xl text-slate-300">{t('Preparing battle...')}</p>
+                        <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-600 animate-bounce">{t('MATCH FOUND!')}</h1>
+                        <p className="text-xl text-slate-600 dark:text-slate-300">{t('Preparing battle...')}</p>
                     </div>
                 )}
 
                 {gameState === 'question' && currentQuestion && (
                     <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <div className="text-center space-y-4">
-                            <span className="px-3 py-1 bg-blue-500/10 text-blue-400 text-xs font-bold uppercase tracking-widest rounded-full border border-blue-500/20">
+                            <span className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest rounded-full border border-blue-500/20">
                                 {currentQuestion.category || t('General Knowledge')}
                             </span>
-                            <h2 className="text-3xl font-bold leading-tight md:text-4xl">
+                            <h2 className="text-3xl font-bold leading-tight md:text-4xl text-slate-900 dark:text-white">
                                 {currentQuestion.question_text}
                             </h2>
                         </div>
@@ -259,9 +259,9 @@ function Arena({ match }: { match: any }) {
                                         p-6 rounded-xl border-2 text-lg font-semibold transition-all duration-200
                                         ${hasAnswered
                                             ? opt === currentQuestion.correct_answer
-                                                ? 'bg-green-500/20 border-green-500 text-green-400'
-                                                : 'bg-slate-800/50 border-slate-700 text-slate-500 opacity-50'
-                                            : 'bg-slate-800/50 border-slate-700 hover:border-blue-500 hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98]'
+                                                ? 'bg-green-500/20 border-green-500 text-green-700 dark:text-green-400'
+                                                : 'bg-slate-200 dark:bg-slate-800/50 border-slate-300 dark:border-slate-700 text-slate-400 dark:text-slate-500 opacity-50'
+                                            : 'bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:scale-[1.02] active:scale-[0.98] text-slate-800 dark:text-white'
                                         }
                                     `}
                                 >
@@ -274,32 +274,32 @@ function Arena({ match }: { match: any }) {
 
                 {gameState === 'result' && (
                     <div className="text-center space-y-8 animate-in zoom-in duration-300">
-                        <h1 className="text-5xl font-black text-white">{t('GAME OVER')}</h1>
+                        <h1 className="text-5xl font-black text-slate-900 dark:text-white">{t('GAME OVER')}</h1>
 
                         <div className="flex justify-center gap-12">
                             <div className="text-center">
-                                <p className="text-slate-400 text-sm uppercase font-bold">{t('You')}</p>
-                                <p className={`text-6xl font-black ${score > opponentScore ? 'text-green-400' : 'text-slate-200'}`}>{score}</p>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm uppercase font-bold">{t('You')}</p>
+                                <p className={`text-6xl font-black ${score > opponentScore ? 'text-green-600 dark:text-green-400' : 'text-slate-700 dark:text-slate-200'}`}>{score}</p>
                             </div>
                             <div className="text-center">
-                                <p className="text-slate-400 text-sm uppercase font-bold">{t('Opponent')}</p>
-                                <p className={`text-6xl font-black ${opponentScore > score ? 'text-green-400' : 'text-slate-200'}`}>{opponentScore}</p>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm uppercase font-bold">{t('Opponent')}</p>
+                                <p className={`text-6xl font-black ${opponentScore > score ? 'text-green-600 dark:text-green-400' : 'text-slate-700 dark:text-slate-200'}`}>{opponentScore}</p>
                             </div>
                         </div>
 
                         <div className="text-2xl font-bold">
                             {score > opponentScore ? (
-                                <span className="text-green-400">{t('VICTORY! +50 PTS')}</span>
+                                <span className="text-green-600 dark:text-green-400">{t('VICTORY! +50 PTS')}</span>
                             ) : score < opponentScore ? (
-                                <span className="text-red-400">{t('DEFEAT -10 PTS')}</span>
+                                <span className="text-red-500 dark:text-red-400">{t('DEFEAT -10 PTS')}</span>
                             ) : (
-                                <span className="text-yellow-400">{t('DRAW')}</span>
+                                <span className="text-yellow-500 dark:text-yellow-400">{t('DRAW')}</span>
                             )}
                         </div>
 
                         <button
                             onClick={() => window.location.href = '/dashboard'}
-                            className="px-8 py-3 bg-white text-slate-900 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+                            className="px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
                         >
                             {t('Back to Dashboard')}
                         </button>

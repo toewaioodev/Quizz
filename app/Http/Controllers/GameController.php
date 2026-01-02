@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\QuizMatch;
 use App\Services\AblyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -27,6 +28,10 @@ class GameController extends Controller
     public function findMatch(Request $request)
     {
         $user = $request->user();
+        
+        if ($user->points < 10) {
+            return response()->json(['message' => 'You need at least 10 points to battle.'], 403);
+        }
         
         // Simple matchmaking logic: Find a pending match or create one
         $pendingMatch = QuizMatch::where('status', 'pending')
@@ -91,18 +96,22 @@ class GameController extends Controller
         ]);
 
         // Points Logic
+        // Points Logic
         if ($request->winner_id) {
-            // Update Winner
-            $winner = \App\Models\User::find($request->winner_id);
-            $winner->increment('points', 50);
-            $winner->increment('wins');
+            // Update Winner: efficiently update points and wins in one query without fetching the model
+            \App\Models\User::where('id', $request->winner_id)->update([
+                'points' => DB::raw('points + 50'),
+                'wins' => DB::raw('wins + 1')
+            ]);
 
             // Find Loser
             $loserId = ($match->player1_id == $request->winner_id) ? $match->player2_id : $match->player1_id;
             if ($loserId) {
-                $loser = \App\Models\User::find($loserId);
-                $loser->decrement('points', 10);
-                $loser->increment('losses');
+                // Update Loser: efficiently update points and losses in one query
+                \App\Models\User::where('id', $loserId)->update([
+                    'points' => DB::raw('points - 10'),
+                    'losses' => DB::raw('losses + 1')
+                ]);
             }
         } else {
              // Draw scenario (optional: give small points to both)

@@ -1,0 +1,170 @@
+[
+    {
+        "category": "Mathematics",
+        "difficulty": "easy",
+        "question_text": "2 + 2 ၏ ရလဒ်သည် အဘယ်နည်း။",
+        "options": [
+            "၃",
+            "၄",
+            "၅",
+            "၆"
+        ],
+        "correct_answer": "၄",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "Mathematics",
+        "difficulty": "medium",
+        "question_text": "စတုရန်းတစ်ခု၏ အနားတစ်ဖက်သည် 5cm ဖြစ်လျှင် ဧရိယာသည် အဘယ်နည်း။",
+        "options": [
+            "20 cm²",
+            "25 cm²",
+            "10 cm²",
+            "15 cm²"
+        ],
+        "correct_answer": "25 cm²",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "Mathematics",
+        "difficulty": "hard",
+        "question_text": "တြိဂံတစ်ခု၏ ထောင့်သုံးခုပေါင်းလဒ်သည် အဘယ်နည်း။",
+        "options": [
+            "90°",
+            "180°",
+            "360°",
+            "270°"
+        ],
+        "correct_answer": "180°",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "Science",
+        "difficulty": "easy",
+        "question_text": "ရေ၏ ဓာတုဗေဒ ဖော်မြူလာသည် အဘယ်နည်း။",
+        "options": [
+            "CO2",
+            "H2O",
+            "O2",
+            "NaCl"
+        ],
+        "correct_answer": "H2O",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "Science",
+        "difficulty": "medium",
+        "question_text": "နေအဖွဲ့အစည်းတွင် အကြီးဆုံးဂြိုဟ်သည် အဘယ်နည်း။",
+        "options": [
+            "ကမ္ဘာ",
+            "အင်္ဂါဂြိုဟ်",
+            "ကြာသပတေးဂြိုဟ်",
+            "စနေဂြိုဟ်"
+        ],
+        "correct_answer": "ကြာသပတေးဂြိုဟ်",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "History",
+        "difficulty": "medium",
+        "question_text": "ပထမမြန်မာနိုင်ငံတော်ကို တည်ထောင်ခဲ့သူမင်းသည် ဦးသူနည်း။",
+        "options": [
+            "အနော်ရထာ",
+            "ဘုရင့်နောင်",
+            "အလောင်းဘုရား",
+            "ကျန်စစ်သား"
+        ],
+        "correct_answer": "အနော်ရထာ",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "History",
+        "difficulty": "easy",
+        "question_text": "မြန်မာနိုင်ငံ လွတ်လပ်ရေးရခဲ့သည့် ခုနှစ်သည် အဘယ်နည်း။",
+        "options": [
+            "၁၉၄၅",
+            "၁၉၄၇",
+            "၁၉၄၈",
+            "၁၉၅၀"
+        ],
+        "correct_answer": "၁၉၄၈",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "Geography",
+        "difficulty": "medium",
+        "question_text": "မြန်မာနိုင်ငံ၏ အရှည်ဆုံးမြစ်သည် အဘယ်နည်း။",
+        "options": [
+            "ဧရာဝတီ",
+            "သံလွင်",
+            "ချင်းတွင်း",
+            "စစ်တောင်း"
+        ],
+        "correct_answer": "ဧရာဝတီ",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "Technology",
+        "difficulty": "easy",
+        "question_text": "ကွန်ပျူတာ၏ ဦးနှောက်ဟု တင်စားခေါ်ဝေါ်သော အရာသည် အဘယ်နည်း။",
+        "options": [
+            "CPU",
+            "RAM",
+            "Hard Disk",
+            "Monitor"
+        ],
+        "correct_answer": "CPU",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "Technology",
+        "difficulty": "medium",
+        "question_text": "Wi-Fi ၏ အဓိပ္ပာယ်အပြည့်အစုံမှာ အဘယ်နည်း။",
+        "options": [
+            "Wireless Fidelity",
+            "Wireless Fiber",
+            "Wide Frequency",
+            "Web Finder"
+        ],
+        "correct_answer": "Wireless Fidelity",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "Arts & Lit",
+        "difficulty": "medium",
+        "question_text": "ဆရာကြီး မင်းသုဝဏ်၏ ထင်ရှားသော ကဗျာတစ်ပုဒ်မှာ...",
+        "options": [
+            "အမေမေ့အိမ်",
+            "ပြေတီဦး",
+            "စံရွှေမြင့်",
+            "သပြေညို"
+        ],
+        "correct_answer": "သပြေညို",
+        "language": "my",
+        "ai_generated": false
+    },
+    {
+        "category": "General Knowledge",
+        "difficulty": "easy",
+        "question_text": "တစ်ပတ်တွင် ဘယ်နှရက် ရှိသနည်း။",
+        "options": [
+            "၅",
+            "၆",
+            "၇",
+            "၈"
+        ],
+        "correct_answer": "၇",
+        "language": "my",
+        "ai_generated": false
+    }
+]

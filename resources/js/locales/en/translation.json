@@ -57,5 +57,22 @@
     "Back to Dashboard": "Back to Dashboard",
     "Round": "Round",
     "Searching...": "Searching...",
-    "No active players yet.": "No active players yet."
+    "No active players yet.": "No active players yet.",
+    "welcome": {
+        "title": "Master the",
+        "title_highlight": "Quiz Arena",
+        "subtitle": "Challenge friends in real-time, generate unique quizzes with AI, and climb the global leaderboard. Prove your knowledge in the ultimate battle of wits.",
+        "cta_start": "Start Playing",
+        "cta_learn": "Learn more",
+        "feature_realtime": "Real-time Battles",
+        "feature_realtime_desc": "Instant",
+        "feature_ai": "AI Powered",
+        "feature_ai_desc": "Unlimited",
+        "feature_competitive": "Competitive",
+        "feature_competitive_desc": "Leaderboards",
+        "feature_community": "Community",
+        "feature_community_desc": "Global",
+        "footer": "Made with ❤️ for Quiz Lovers",
+        "welcome_title": "Welcome to Quizz"
+    }
 }

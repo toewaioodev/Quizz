@@ -18,7 +18,7 @@ createServer(
     page,
     render: ReactDOMServer.renderToString,
     title: (title) => title ? `${title} - ${appName}` : appName,
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, /* @__PURE__ */ Object.assign({ "./pages/Arena.tsx": () => import("./assets/Arena-BGNjJgIK.js"), "./pages/Auth/Login.tsx": () => import("./assets/Login-DBh-90dH.js"), "./pages/Auth/Register.tsx": () => import("./assets/Register-B5X3cbXJ.js"), "./pages/Dashboard.tsx": () => import("./assets/Dashboard-BHLcsdrF.js"), "./pages/Leaderboard/Index.tsx": () => import("./assets/Index-CdTztJgR.js"), "./pages/Lobby.tsx": () => import("./assets/Lobby-BDxj_oZl.js"), "./pages/Profile/Show.tsx": () => import("./assets/Show-NaT2_47T.js"), "./pages/welcome.tsx": () => import("./assets/welcome-7SnUOAs3.js") })),
+    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, /* @__PURE__ */ Object.assign({ "./pages/Arena.tsx": () => import("./assets/Arena-cqxQZSC6.js"), "./pages/Auth/Login.tsx": () => import("./assets/Login-DBh-90dH.js"), "./pages/Auth/Register.tsx": () => import("./assets/Register-B5X3cbXJ.js"), "./pages/Dashboard.tsx": () => import("./assets/Dashboard-DvpbnoLZ.js"), "./pages/Leaderboard/Index.tsx": () => import("./assets/Index-BYmv0CP1.js"), "./pages/Lobby.tsx": () => import("./assets/Lobby-ZWNjRP-S.js"), "./pages/Profile/Show.tsx": () => import("./assets/Show-K5V99wC8.js"), "./pages/welcome.tsx": () => import("./assets/welcome-BR3zHh19.js") })),
     setup: ({ App, props }) => /* @__PURE__ */ jsx(App, { ...props })
   })
 );

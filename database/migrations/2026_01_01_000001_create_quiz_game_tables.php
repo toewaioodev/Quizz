@@ -30,7 +30,7 @@ return new class extends Migration
         });
         
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('points')->default(0);
+            $table->integer('points')->default(100);
             $table->integer('wins')->default(0);
             $table->integer('losses')->default(0);
         });

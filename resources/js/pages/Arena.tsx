@@ -27,10 +27,12 @@ function Arena({ match }: { match: any }) {
     const { t } = useTranslation();
 
     // Determine initial opponent (if P2 joins, P1 is opponent)
-    // Actually, we can just rely on the match object from props initially
-    // But for dynamic updates, we might want to listen to presence
+    // We prefer the state.opponent (from realtime events) if available, 
+    // otherwise fallback to prop (initial load for P2) or null (initial load for P1)
     const initialOpponent = match.player1_id === user.id ? match.player2 : match.player1;
-    const [opponent, setOpponent] = useState(initialOpponent);
+
+    // We don't need local state for opponent if we derive it from props + hook state
+    // But to keep it simple, let's derive it.
 
     const isHost = match.player1_id === user.id;
 
@@ -42,24 +44,18 @@ function Arena({ match }: { match: any }) {
         isHost
     );
 
+    // Effective Opponent
+    const opponent = state.opponent || initialOpponent;
+
     // Presence Logic for "Opponent Online" status
     usePresence(`match:${match.channel_id}`);
     const { presenceData } = usePresenceListener(`match:${match.channel_id}`);
     const [opponentPresent, setOpponentPresent] = useState(false);
 
     useEffect(() => {
-        // If we found a match via Ably (opponent joined), update local opponent state
-        // The GameEngine handles state transition, but we might need opponent details
-        if (state.status === 'STARTING' && !opponent) {
-            // We generally expect opponent details to be passed or updated via mechanism
-            // For now, if we are P1, and P2 joins, `match` prop might be stale if not re-fetched.
-            // Simplification: We rely on Presence data or reload.
-            // or we can optimistically set opponent if we get a match-found event with data
-        }
-
         const isOpponentHere = presenceData.some((p: any) => p.clientId === String(opponent?.id));
         setOpponentPresent(isOpponentHere);
-    }, [presenceData, opponent, state.status]);
+    }, [presenceData, opponent]);
 
 
     // Derived UI State

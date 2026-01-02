@@ -30,10 +30,11 @@ interface State {
     winnerId: number | null;
     opponentAnswered: boolean;
     hasAnswered: boolean;
+    opponent: any | null;
 }
 
 type Action =
-    | { type: 'MATCH_FOUND' }
+    | { type: 'MATCH_FOUND'; payload: any }
     | { type: 'GAME_START'; payload: any }
     | { type: 'NEW_QUESTION'; payload: Question }
     | { type: 'TICK_TIMER' }
@@ -51,13 +52,28 @@ const initialState: State = {
     winnerId: null,
     opponentAnswered: false,
     hasAnswered: false,
+    opponent: null,
 };
 
 function reducer(state: State, action: Action): State {
     switch (action.type) {
         case 'MATCH_FOUND':
-            return { ...state, status: 'STARTING' };
+            return {
+                ...state,
+                status: 'STARTING',
+                opponent: action.payload.opponent // From match-found event
+            };
         case 'GAME_START':
+            // Payload has { players: { p1, p2 } }
+            // We need to figure out which one is opponent based on userId passed to hook?
+            // But reducer doesn't know userId.
+            // We can pass userId in initialState or rely on component to filter?
+            // Or better: Store BOTH players in state.
+            // Let's store opponent if we can determine it. 
+            // Ideally we just expose 'players' and let Component decide.
+            // But to minimize changes, let's keep 'opponent'.
+            // We can't determine who is opponent here easily without userId.
+            // Let's add 'players' to state instead.
             return { ...state, status: 'STARTING' };
         case 'NEW_QUESTION':
             return {
@@ -102,7 +118,7 @@ export function useGameEngine(matchId: number, channelId: string, userId: number
         console.log('Event:', message.name, message.data);
         switch (message.name) {
             case 'match-found':
-                dispatch({ type: 'MATCH_FOUND' });
+                dispatch({ type: 'MATCH_FOUND', payload: message.data });
                 // If host, trigger start after delay? Or manual?
                 // For now, let's assume Host triggers start automatically or via button
                 if (isHost) {

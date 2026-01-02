@@ -27,6 +27,7 @@ class GameController extends Controller
         ]);
     }
 
+
     public function findMatch(Request $request)
     {
         $user = $request->user();
@@ -35,17 +36,22 @@ class GameController extends Controller
             return response()->json(['message' => 'You need at least 10 points to battle.'], 403);
         }
         
-        return DB::transaction(function () use ($user) {
-            // Lock the table or specific rows to prevent race conditions
-            // We search for a pending match with lock
-            $pendingMatch = QuizMatch::lockForUpdate()
-                ->where('status', 'pending')
+        // Use an atomic lock to ensure only one person is "Matchmaking" at a time
+        // This prevents the race condition where 2 people check "pending" -> find nothing -> both create
+        $lock = \Illuminate\Support\Facades\Cache::lock('matchmaking_lock', 10);
+
+        try {
+            // Block until lock is acquired (wait up to 5s)
+            $lock->block(5);
+
+            // 1. Search for an available match
+            $pendingMatch = QuizMatch::where('status', 'pending')
                 ->where('player1_id', '!=', $user->id)
                 ->where('updated_at', '>=', now()->subMinute())
+                ->lockForUpdate() // Still good to lock the row if found
                 ->first();
 
             if ($pendingMatch) {
-                // Double check status just in case (though lock handles it)
                 $pendingMatch->update([
                     'player2_id' => $user->id,
                     'status' => 'pending_start', 
@@ -59,21 +65,36 @@ class GameController extends Controller
                         'opponent' => $user 
                     ]
                 );
+                
+                // Release lock immediately so others can proceed (e.g. creating their own matches if full)
+                $lock->release();
 
                 return response()->json(['match_id' => $pendingMatch->id, 'channel_id' => $pendingMatch->channel_id, 'role' => 'player2']);
             } else {
-                // No pending match found, create one
-                // We don't need to lock for creation, but since we're in a transaction 
-                // and we didn't find one, we are safe to create.
+                // 2. No match found, create one
+                // Check if I already have a pending match to avoid spam?
+                // Optional optimization: remove my old pending matches
+                QuizMatch::where('player1_id', $user->id)
+                    ->where('status', 'pending')
+                    ->update(['status' => 'cancelled']);
+
                 $match = QuizMatch::create([
                     'player1_id' => $user->id,
                     'status' => 'pending',
                     'channel_id' => Str::uuid(),
                 ]);
+                
+                $lock->release();
 
                 return response()->json(['match_id' => $match->id, 'channel_id' => $match->channel_id, 'role' => 'player1']);
             }
-        });
+
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            return response()->json(['message' => 'Matchmaking is busy, please try again.'], 429);
+        } catch (\Exception $e) {
+             optional($lock)->release();
+             throw $e;
+        }
     }
 
     public function startMatch(Request $request, $id)

@@ -42,7 +42,11 @@ class GameStateService
             [
                 'match_id' => $match->id,
                 'total_questions' => 5,
-                'start_time' => now()->timestamp
+                'start_time' => now()->timestamp,
+                'players' => [
+                    'p1' => $match->player1,
+                    'p2' => $match->player2
+                ]
             ]
         );
 

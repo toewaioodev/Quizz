@@ -14,12 +14,18 @@ const initialState = {
   lastRoundResult: null,
   winnerId: null,
   opponentAnswered: false,
-  hasAnswered: false
+  hasAnswered: false,
+  opponent: null
 };
 function reducer(state, action) {
   switch (action.type) {
     case "MATCH_FOUND":
-      return { ...state, status: "STARTING" };
+      return {
+        ...state,
+        status: "STARTING",
+        opponent: action.payload.opponent
+        // From match-found event
+      };
     case "GAME_START":
       return { ...state, status: "STARTING" };
     case "NEW_QUESTION":
@@ -63,7 +69,7 @@ function useGameEngine(matchId, channelId, userId, isHost) {
     console.log("Event:", message.name, message.data);
     switch (message.name) {
       case "match-found":
-        dispatch({ type: "MATCH_FOUND" });
+        dispatch({ type: "MATCH_FOUND", payload: message.data });
         if (isHost) {
           setTimeout(() => startGame(), 2e3);
         }
@@ -161,7 +167,6 @@ function Arena({ match }) {
   const user = usePage().props.auth.user;
   const { t } = useTranslation();
   const initialOpponent = match.player1_id === user.id ? match.player2 : match.player1;
-  const [opponent, setOpponent] = useState(initialOpponent);
   const isHost = match.player1_id === user.id;
   const { state, submitAnswer } = useGameEngine(
     match.id,
@@ -169,14 +174,14 @@ function Arena({ match }) {
     user.id,
     isHost
   );
+  const opponent = state.opponent || initialOpponent;
   usePresence(`match:${match.channel_id}`);
   const { presenceData } = usePresenceListener(`match:${match.channel_id}`);
   const [opponentPresent, setOpponentPresent] = useState(false);
   useEffect(() => {
-    if (state.status === "STARTING" && !opponent) ;
     const isOpponentHere = presenceData.some((p) => p.clientId === String(opponent?.id));
     setOpponentPresent(isOpponentHere);
-  }, [presenceData, opponent, state.status]);
+  }, [presenceData, opponent]);
   const timer = state.timer;
   const currentQuestion = state.currentQuestion;
   const score = state.playerScores[match.player1_id === user.id ? "p1" : "p2"];

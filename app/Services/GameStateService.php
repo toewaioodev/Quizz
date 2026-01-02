@@ -79,72 +79,72 @@ class GameStateService
 
     public function submitAnswer($matchId, $userId, $questionId, $answer)
     {
-        $match = QuizMatch::findOrFail($matchId);
-        
-        if ($match->player1_id != $userId && $match->player2_id != $userId) {
-            return ['error' => 'Not a player in this match'];
-        }
-
-        $question = Question::find($questionId);
-        if (!$question) return ['error' => 'Question not found'];
-        
-        // Prevent double answering
-        $answers = $match->round_answers ?? [];
-        $playerKey = ($userId == $match->player1_id) ? 'p1' : 'p2';
-        
-        if (isset($answers[$playerKey])) {
-            return ['error' => 'Already answered'];
-        }
-
-        $isCorrect = $question->correct_answer === $answer;
-        $points = 0;
-
-        if ($isCorrect) {
-            // Server calc: Time since question sent
-            $sentAt = $match->last_question_at;
-            $now = now();
-            // Diff in seconds (float)
-            $diffInSeconds = $sentAt ? $now->diffInSeconds($sentAt) : 15; // default to max time if null
+        return DB::transaction(function () use ($matchId, $userId, $questionId, $answer) {
+            $match = QuizMatch::lockForUpdate()->find($matchId);
             
-            // Assume 15s limit. 
-            // If they tool 2s, remaining = 13s. Points = 13 * 10
-            $timeTaken = abs($diffInSeconds); // safety
-            $timeRemaining = max(15 - $timeTaken, 0);
+            if (!$match) return ['error' => 'Match not found'];
             
-            $points = (int) round($timeRemaining * 10);
-        }
-
-        // Update Score State in memory
-        $scores = $match->player_scores ?? ['p1' => 0, 'p2' => 0];
-        $scores[$playerKey] += $points;
-        
-        // Update Answers
-        $answers[$playerKey] = $answer; // or just true if we don't care about inspecting later
-
-        $match->update([
-            'player_scores' => $scores,
-            'round_answers' => $answers
-        ]);
-
-        $this->ablyService->publish(
-            "match:{$match->channel_id}",
-            'game:answered',
-            ['clientId' => (string)$userId]
-        );
-        
-        // Check if both answered
-        if (count($answers) >= 2) {
-            // Wait a moment before resolving? Or resolve immediately?
-            // Resolve immediately and let frontend handle visual delay
-            $this->concludeRound($match);
-        }
-
-        return [
-            'correct' => $isCorrect,
-            'points' => $points,
-            'new_score' => $scores[$playerKey],
-            'answers_count' => count($answers)
-        ];
+            if ($match->player1_id != $userId && $match->player2_id != $userId) {
+                return ['error' => 'Not a player in this match'];
+            }
+    
+            $question = Question::find($questionId);
+            if (!$question) return ['error' => 'Question not found'];
+            
+            // Prevent double answering
+            $answers = $match->round_answers ?? [];
+            $playerKey = ($userId == $match->player1_id) ? 'p1' : 'p2';
+            
+            if (isset($answers[$playerKey])) {
+                return ['error' => 'Already answered'];
+            }
+    
+            $isCorrect = $question->correct_answer === $answer;
+            $points = 0;
+    
+            if ($isCorrect) {
+                // Server calc: Time since question sent
+                $sentAt = $match->last_question_at;
+                $now = now();
+                // Diff in seconds (float)
+                $diffInSeconds = $sentAt ? $now->diffInSeconds($sentAt) : 15;
+                
+                $timeTaken = abs($diffInSeconds); 
+                $timeRemaining = max(15 - $timeTaken, 0);
+                
+                $points = (int) round($timeRemaining * 10);
+            }
+    
+            // Update Score State in memory
+            $scores = $match->player_scores ?? ['p1' => 0, 'p2' => 0];
+            $scores[$playerKey] += $points;
+            
+            // Update Answers
+            $answers[$playerKey] = $answer;
+    
+            $match->update([
+                'player_scores' => $scores,
+                'round_answers' => $answers
+            ]);
+    
+            $this->ablyService->publish(
+                "match:{$match->channel_id}",
+                'game:answered',
+                ['clientId' => (string)$userId]
+            );
+            
+            // Check if both answered (Atomic check inside transaction)
+            if (count($answers) >= 2) {
+                $this->concludeRound($match);
+            }
+    
+            return [
+                'correct' => $isCorrect,
+                'points' => $points,
+                'new_score' => $scores[$playerKey],
+                'answers_count' => count($answers)
+            ];
+        });
     }
     
     public function getCurrentState($matchId)

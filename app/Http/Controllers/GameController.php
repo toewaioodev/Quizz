@@ -35,36 +35,45 @@ class GameController extends Controller
             return response()->json(['message' => 'You need at least 10 points to battle.'], 403);
         }
         
-        $pendingMatch = QuizMatch::where('status', 'pending')
-            ->where('player1_id', '!=', $user->id)
-            ->where('updated_at', '>=', now()->subMinute())
-            ->first();
+        return DB::transaction(function () use ($user) {
+            // Lock the table or specific rows to prevent race conditions
+            // We search for a pending match with lock
+            $pendingMatch = QuizMatch::lockForUpdate()
+                ->where('status', 'pending')
+                ->where('player1_id', '!=', $user->id)
+                ->where('updated_at', '>=', now()->subMinute())
+                ->first();
 
-        if ($pendingMatch) {
-            $pendingMatch->update([
-                'player2_id' => $user->id,
-                'status' => 'pending_start', // Waiting for P1 to trigger start or auto-start
-            ]);
-            
-            $this->ablyService->publish(
-                "match:{$pendingMatch->channel_id}", 
-                'match-found', 
-                [
-                    'match_id' => $pendingMatch->id,
-                    'opponent' => $user 
-                ]
-            );
+            if ($pendingMatch) {
+                // Double check status just in case (though lock handles it)
+                $pendingMatch->update([
+                    'player2_id' => $user->id,
+                    'status' => 'pending_start', 
+                ]);
+                
+                $this->ablyService->publish(
+                    "match:{$pendingMatch->channel_id}", 
+                    'match-found', 
+                    [
+                        'match_id' => $pendingMatch->id,
+                        'opponent' => $user 
+                    ]
+                );
 
-            return response()->json(['match_id' => $pendingMatch->id, 'channel_id' => $pendingMatch->channel_id, 'role' => 'player2']);
-        } else {
-            $match = QuizMatch::create([
-                'player1_id' => $user->id,
-                'status' => 'pending',
-                'channel_id' => Str::uuid(),
-            ]);
+                return response()->json(['match_id' => $pendingMatch->id, 'channel_id' => $pendingMatch->channel_id, 'role' => 'player2']);
+            } else {
+                // No pending match found, create one
+                // We don't need to lock for creation, but since we're in a transaction 
+                // and we didn't find one, we are safe to create.
+                $match = QuizMatch::create([
+                    'player1_id' => $user->id,
+                    'status' => 'pending',
+                    'channel_id' => Str::uuid(),
+                ]);
 
-            return response()->json(['match_id' => $match->id, 'channel_id' => $match->channel_id, 'role' => 'player1']);
-        }
+                return response()->json(['match_id' => $match->id, 'channel_id' => $match->channel_id, 'role' => 'player1']);
+            }
+        });
     }
 
     public function startMatch(Request $request, $id)

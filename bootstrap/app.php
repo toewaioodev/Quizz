@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
-        $middleware->redirectUsersTo(fn () => route('dashboard'));
+        $middleware->redirectUsersTo(fn () => route('home'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

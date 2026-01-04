@@ -26,7 +26,7 @@ export default function Login() {
                 <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 blur-3xl" />
 
                 <div className="text-center mb-10 relative z-10">
-                    <Link href="/" className="inline-block mb-4 hover:scale-105 transition-transform duration-300">
+                    <Link href="/welcome" className="inline-block mb-4 hover:scale-105 transition-transform duration-300">
                         <div className="h-16 w-16 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-3xl shadow-xl shadow-blue-500/30">
                             Q
                         </div>

@@ -4,6 +4,8 @@
 
 ![Project Banner](public/images/banner.png)
 ![Project Banner](public/images/banner_2.png)
+![Project Banner](public/images/banner_3.png)
+![Project Banner](public/images/banner_4.png)
 
 ## 🚀 Key Features
 

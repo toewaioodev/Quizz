@@ -2,7 +2,7 @@ import ArenaHeader from '@/Components/ArenaHeader';
 import ThemeSwitcher from '@/Components/ThemeSwitcher';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { Head, usePage } from '@inertiajs/react';
-import { AblyProvider, ChannelProvider, useChannel, usePresence, usePresenceListener } from 'ably/react';
+import { ChannelProvider, useChannel, usePresence, usePresenceListener } from 'ably/react';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SharedData } from '../types';
@@ -24,19 +24,14 @@ function Arena({ match }: { match: any }) {
     const { t } = useTranslation();
 
     // Determine initial opponent (if P2 joins, P1 is opponent)
-    // We prefer the state.opponent (from realtime events) if available, 
+    // We prefer the state.opponent (from realtime events) if available,
     // otherwise fallback to prop (initial load for P2) or null (initial load for P1)
     const initialOpponent = match.player1_id === user.id ? match.player2 : match.player1;
 
     const isHost = Number(match.player1_id) === Number(user.id);
 
     // Use Game Engine Hook
-    const { state, startGame, submitAnswer, nextQuestion } = useGameEngine(
-        match.id,
-        match.channel_id,
-        user.id,
-        isHost
-    );
+    const { state, startGame, submitAnswer, nextQuestion } = useGameEngine(match.id, match.channel_id, user.id, isHost);
 
     // Effective Opponent
     const opponent = state.opponent || initialOpponent;
@@ -76,7 +71,6 @@ function Arena({ match }: { match: any }) {
         }
     }, [globalChannel, user]);
 
-
     // Derived UI State
     const timer = state.timer;
     const currentQuestion = state.currentQuestion;
@@ -115,7 +109,6 @@ function Arena({ match }: { match: any }) {
             {/* Main Game Area */}
             <div className="z-10 flex w-full max-w-4xl flex-1 flex-col justify-center p-2 md:p-4">
                 <div className="relative flex min-h-[400px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white/80 shadow-2xl backdrop-blur-xl transition-all duration-500 md:min-h-[500px] dark:border-white/10 dark:bg-slate-900/60">
-
                     {/* Waiting State */}
                     {state.status === 'WAITING_FOR_OPPONENT' && (
                         <div className="animate-in fade-in md:p6 flex flex-1 flex-col items-center justify-center space-y-8 p-4 text-center duration-700 md:p-6">
@@ -166,12 +159,7 @@ function Arena({ match }: { match: any }) {
 
                     {/* Game Over State */}
                     {state.status === 'GAME_OVER' && (
-                        <GameOverDisplay
-                            score={score}
-                            opponentScore={opponentScore}
-                            isWinner={isWinner}
-                            isDraw={isDraw}
-                        />
+                        <GameOverDisplay score={score} opponentScore={opponentScore} isWinner={isWinner} isDraw={isDraw} />
                     )}
                 </div>
             </div>
@@ -183,18 +171,33 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
     const { t, i18n } = useTranslation();
     const isBurmese = i18n.language === 'my';
 
-    const displayText = (isBurmese && currentQuestion.text_my) ? currentQuestion.text_my : currentQuestion.text;
-    const displayOptions = (isBurmese && currentQuestion.options_my) ? currentQuestion.options_my : currentQuestion.options;
+    const displayText = isBurmese && currentQuestion.text_my ? currentQuestion.text_my : currentQuestion.text;
+    const displayOptions = isBurmese && currentQuestion.options_my ? currentQuestion.options_my : currentQuestion.options;
 
     // Animation delay for staggered reveal
-    const getDelay = (index: number) => `${index * 100}ms`;
+    const getDelay = (index: number) => `${index * 10}ms`;
+
+    // Play sound for correct/wrong answer on ROUND_RESULT
+    useEffect(() => {
+        if (status === 'ROUND_RESULT' && lastRoundResult && hasAnswered) {
+            if (lastRoundResult.correct_option === userAnswer) {
+                // Correct answer sound
+                const audio = new Audio('/sounds/correct.mp3');
+                audio.play().catch(() => {});
+            } else {
+                // Wrong answer sound
+                const audio = new Audio('/sounds/wrong.mp3');
+                audio.play().catch(() => {});
+            }
+        }
+    }, [status, lastRoundResult, hasAnswered, userAnswer]);
 
     return (
-        <div className="flex flex-1 flex-col p-4 md:p-8 w-full max-w-4xl mx-auto">
+        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col p-4 md:p-8">
             {/* Question Card */}
             <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 p-1 shadow-lg backdrop-blur-md dark:from-indigo-500/5 dark:to-purple-500/5">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient-x"></div>
-                <div className="relative rounded-xl bg-white/50 p-6 text-center dark:bg-slate-900/50 md:p-10">
+                <div className="animate-gradient-x absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+                <div className="relative rounded-xl bg-white/50 p-6 text-center md:p-10 dark:bg-slate-900/50">
                     <span className="mb-4 inline-block rounded-full bg-blue-100 px-4 py-1 text-xs font-bold tracking-widest text-blue-700 uppercase dark:bg-blue-900/30 dark:text-blue-300">
                         {currentQuestion.category}
                     </span>
@@ -211,26 +214,57 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
                     const isCorrect = lastRoundResult?.correct_option === opt;
                     const showResult = status === 'ROUND_RESULT';
 
-                    let buttonStyle = "border-slate-200 bg-white/80 text-slate-700 hover:border-blue-400 hover:bg-blue-50/50 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-900/20";
-                    let icon = <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-current opacity-70 text-sm font-bold transition-all group-hover:bg-current group-hover:text-white group-hover:border-transparent">{String.fromCharCode(65 + idx)}</span>;
+                    let buttonStyle =
+                        'border-slate-200 bg-white/80 text-slate-700 hover:border-blue-400 hover:bg-blue-50/50 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-900/20';
+                    let icon = (
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-current text-sm font-bold opacity-70 transition-all group-hover:border-transparent group-hover:bg-current group-hover:text-white">
+                            {String.fromCharCode(65 + idx)}
+                        </span>
+                    );
 
                     if (hasAnswered) {
-                        buttonStyle = "border-slate-200 bg-slate-50 text-slate-400 cursor-default dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-600";
+                        buttonStyle =
+                            'border-slate-200 bg-slate-50 text-slate-400 cursor-default dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-600';
                         if (isSelected) {
-                            buttonStyle = "border-blue-500 bg-blue-100/50 text-blue-700 dark:border-blue-500 dark:bg-blue-900/30 dark:text-blue-300";
-                            icon = <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-white"><svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>;
+                            buttonStyle = 'border-blue-500 bg-blue-100/50 text-blue-700 dark:border-blue-500 dark:bg-blue-900/30 dark:text-blue-300';
+                            icon = (
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-white">
+                                    <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            );
                         }
                     }
 
                     if (showResult) {
                         if (isCorrect) {
-                            buttonStyle = "border-green-500 bg-green-100 text-green-800 shadow-[0_0_20px_rgba(34,197,94,0.3)] scale-[1.02] z-10 dark:border-green-500 dark:bg-green-900/30 dark:text-green-300";
-                            icon = <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500 text-white"><svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></div>;
+                            buttonStyle =
+                                'border-green-500 bg-green-100 text-green-800 shadow-[0_0_20px_rgba(34,197,94,0.3)] scale-[1.02] z-10 dark:border-green-500 dark:bg-green-900/30 dark:text-green-300';
+                            icon = (
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500 text-white">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                            );
                         } else if (isSelected) {
-                            buttonStyle = "border-red-500 bg-red-100 text-red-800 opacity-80 dark:border-red-500 dark:bg-red-900/30 dark:text-red-300";
-                            icon = <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500 text-white"><svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg></div>;
+                            buttonStyle =
+                                'border-red-500 bg-red-100 text-red-800 opacity-80 dark:border-red-500 dark:bg-red-900/30 dark:text-red-300';
+                            icon = (
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500 text-white">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </div>
+                            );
                         } else {
-                            buttonStyle = "grayscale opacity-50 border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50";
+                            buttonStyle = 'grayscale opacity-50 border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50';
                         }
                     }
 
@@ -239,7 +273,7 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
                             key={idx}
                             onClick={() => submitAnswer(currentQuestion.options[idx])}
                             disabled={hasAnswered || showResult}
-                            className={`group relative flex items-center gap-4 overflow-hidden rounded-2xl border-2 p-5 text-left transition-all duration-300 shadow-sm ${buttonStyle}`}
+                            className={`group relative flex items-center gap-4 overflow-hidden rounded-2xl border-2 p-5 text-left shadow-sm transition-all duration-300 ${buttonStyle}`}
                             style={{ animationDelay: getDelay(idx) }}
                         >
                             <div className="shrink-0">{icon}</div>
@@ -247,7 +281,7 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
 
                             {/* Hover Gradient Effect */}
                             {!hasAnswered && !showResult && (
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]"></div>
+                                <div className="absolute inset-0 translate-x-[-100%] -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:translate-x-[100%] group-hover:opacity-100"></div>
                             )}
                         </button>
                     );
@@ -257,10 +291,10 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
             {/* Opponent Answered Indicator */}
             {opponentAnswered && !lastRoundResult && (
                 <div className="mt-8 flex justify-center">
-                    <div className="flex items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-red-600 animate-pulse dark:bg-red-900/30 dark:text-red-400">
+                    <div className="flex animate-pulse items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-red-600 dark:bg-red-900/30 dark:text-red-400">
                         <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
                         </span>
                         {t('Opponent has answered!')}
                     </div>
@@ -279,27 +313,25 @@ const GameOverDisplay = memo(({ score, opponentScore, isWinner, isDraw }: any) =
         if (isWinner) {
             // Victory Sound
             const audio = new Audio('/sounds/victory.mp3');
-            audio.play().catch(e => console.log("Audio play failed", e));
+            audio.play().catch((e) => console.log('Audio play failed', e));
 
             // Confetti
             confetti({
                 particleCount: 150,
                 spread: 70,
                 origin: { y: 0.6 },
-                colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b']
+                colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'],
             });
         } else if (!isDraw) {
             // Defeat Sound
             const audio = new Audio('/sounds/defeat.mp3');
-            audio.play().catch(e => console.log("Audio play failed", e));
+            audio.play().catch((e) => console.log('Audio play failed', e));
         }
     }, [isWinner, isDraw]);
 
     return (
         <div className="animate-in zoom-in flex flex-1 flex-col items-center justify-center space-y-8 p-8 text-center duration-500">
-            <h1 className="text-4xl font-black tracking-tight text-slate-900 uppercase md:text-6xl dark:text-white">
-                {t('GAME OVER')}
-            </h1>
+            <h1 className="text-4xl font-black tracking-tight text-slate-900 uppercase md:text-6xl dark:text-white">{t('GAME OVER')}</h1>
 
             <div className="flex w-full items-end justify-center gap-8 md:gap-16">
                 {/* Result Avatars similar to before */}
@@ -314,7 +346,13 @@ const GameOverDisplay = memo(({ score, opponentScore, isWinner, isDraw }: any) =
             </div>
 
             <div className="pt-8 text-3xl font-bold">
-                {isWinner ? <span className="text-green-500">VICTORY!</span> : isDraw ? <span className="text-yellow-500">DRAW</span> : <span className="text-red-500">DEFEAT</span>}
+                {isWinner ? (
+                    <span className="text-green-500">VICTORY!</span>
+                ) : isDraw ? (
+                    <span className="text-yellow-500">DRAW</span>
+                ) : (
+                    <span className="text-red-500">DEFEAT</span>
+                )}
             </div>
 
             <button

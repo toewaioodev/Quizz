@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { AblyProvider, ChannelProvider, useChannel } from 'ably/react';
+import { ChannelProvider, useChannel } from 'ably/react';
 import axios from 'axios';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,10 +31,13 @@ function LobbyContent() {
             try {
                 const members = await channel.presence.get();
                 // Deduplicate users: Extract data immediately and filter out empty data
-                const unique = Array.from(new Map(members
-                    .filter((p: any) => p.data) // Filter out messages without data
-                    .map((p: any) => [p.clientId, p.data])
-                ).values());
+                const unique = Array.from(
+                    new Map(
+                        members
+                            .filter((p: any) => p.data) // Filter out messages without data
+                            .map((p: any) => [p.clientId, p.data]),
+                    ).values(),
+                );
                 setActiveUsers(unique);
             } catch (err) {
                 console.error('Error fetching presence:', err);
@@ -54,16 +57,20 @@ function LobbyContent() {
         };
     }, [channel]);
 
-    const handleInvite = useCallback((inviteeId: number) => {
-        axios.post('/match/invite', { user_id: inviteeId })
-            .then(() => {
-                alert(t('Invitation sent!'));
-            })
-            .catch((err) => {
-                console.error(err);
-                alert(t('Failed to send invitation.'));
-            });
-    }, [t]);
+    const handleInvite = useCallback(
+        (inviteeId: number) => {
+            axios
+                .post('/match/invite', { user_id: inviteeId })
+                .then(() => {
+                    alert(t('Invitation sent!'));
+                })
+                .catch((err) => {
+                    console.error(err);
+                    alert(t('Failed to send invitation.'));
+                });
+        },
+        [t],
+    );
 
     const findMatch = useCallback(() => {
         setSearching(true);
@@ -128,7 +135,7 @@ function LobbyContent() {
     );
 }
 
-const LobbyStats = memo(({ user, searching, findMatch }: { user: any, searching: boolean, findMatch: () => void }) => {
+const LobbyStats = memo(({ user, searching, findMatch }: { user: any; searching: boolean; findMatch: () => void }) => {
     const { t } = useTranslation();
     return (
         <div className="rounded-2xl border border-slate-200 bg-white/50 p-6 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/50">
@@ -150,16 +157,16 @@ const LobbyStats = memo(({ user, searching, findMatch }: { user: any, searching:
             <button
                 onClick={findMatch}
                 disabled={searching || (user.points || 0) < 10}
-                className={`group relative w-full overflow-hidden rounded-xl p-[1px] transition-all ${(user.points || 0) < 10
-                    ? 'cursor-not-allowed bg-slate-300 opacity-50 dark:bg-slate-700'
-                    : 'bg-gradient-to-r from-blue-600 to-violet-600 hover:scale-[1.02] active:scale-[0.98]'
-                    }`}
+                className={`group relative w-full overflow-hidden rounded-xl p-[1px] transition-all ${
+                    (user.points || 0) < 10
+                        ? 'cursor-not-allowed bg-slate-300 opacity-50 dark:bg-slate-700'
+                        : 'bg-gradient-to-r from-blue-600 to-violet-600 hover:scale-[1.02] active:scale-[0.98]'
+                }`}
             >
                 <div
-                    className={`relative flex h-14 items-center justify-center gap-3 rounded-[11px] transition-colors ${(user.points || 0) < 10
-                        ? 'bg-slate-100 dark:bg-slate-900'
-                        : 'bg-slate-50 group-hover:bg-transparent dark:bg-slate-950/50'
-                        }`}
+                    className={`relative flex h-14 items-center justify-center gap-3 rounded-[11px] transition-colors ${
+                        (user.points || 0) < 10 ? 'bg-slate-100 dark:bg-slate-900' : 'bg-slate-50 group-hover:bg-transparent dark:bg-slate-950/50'
+                    }`}
                 >
                     {searching ? (
                         <>
@@ -176,9 +183,7 @@ const LobbyStats = memo(({ user, searching, findMatch }: { user: any, searching:
                                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                                 />
                             </svg>
-                            <span className="text-lg font-semibold tracking-wide text-slate-500 dark:text-slate-400">
-                                {t('Need 10 Points')}
-                            </span>
+                            <span className="text-lg font-semibold tracking-wide text-slate-500 dark:text-slate-400">{t('Need 10 Points')}</span>
                         </>
                     ) : (
                         <>
@@ -200,7 +205,10 @@ const LobbyActions = memo(() => {
     const { t } = useTranslation();
     return (
         <div className="grid grid-cols-2 gap-4">
-            <button className="group rounded-xl border border-slate-200 bg-white/50 p-4 text-left transition-colors hover:border-purple-400/50 dark:border-white/5 dark:bg-slate-900/50 dark:hover:border-white/20">
+            <Link
+                href="/"
+                className="group rounded-xl border border-slate-200 bg-white/50 p-4 text-left transition-colors hover:border-purple-400/50 dark:border-white/5 dark:bg-slate-900/50 dark:hover:border-white/20"
+            >
                 <div className="mb-2 origin-left text-purple-600 transition-transform group-hover:scale-110 dark:text-purple-400">
                     <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -212,7 +220,7 @@ const LobbyActions = memo(() => {
                     </svg>
                 </div>
                 <div className="text-sm font-semibold text-slate-700 dark:text-white">{t('Practice Mode')}</div>
-            </button>
+            </Link>
             <Link
                 href="/leaderboard"
                 className="group rounded-xl border border-slate-200 bg-white/50 p-4 text-left transition-colors hover:border-blue-400/50 dark:border-white/5 dark:bg-slate-900/50 dark:hover:border-white/20"
@@ -233,7 +241,7 @@ const LobbyActions = memo(() => {
     );
 });
 
-const ActivePlayersList = memo(({ activeUsers, user, handleInvite }: { activeUsers: any[], user: any, handleInvite: (id: number) => void }) => {
+const ActivePlayersList = memo(({ activeUsers, user, handleInvite }: { activeUsers: any[]; user: any; handleInvite: (id: number) => void }) => {
     const { t } = useTranslation();
     return (
         <div className="h-full min-h-[400px] rounded-2xl border border-slate-200 bg-white/30 p-6 backdrop-blur-md dark:border-white/5 dark:bg-slate-900/30">
@@ -256,10 +264,11 @@ const ActivePlayersList = memo(({ activeUsers, user, handleInvite }: { activeUse
 
                         <div className="flex-1">
                             <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-                                {p.name}{' '}
-                                {p.id == user.id && <span className="text-green-600 dark:text-green-400">({t('You')})</span>}
+                                {p.name} {p.id == user.id && <span className="text-green-600 dark:text-green-400">({t('You')})</span>}
                             </p>
-                            <p className="text-xs text-slate-500">{p.status === 'playing' ? t('In Match') : (p.status === 'searching' ? t('Searching...') : t('Online'))}</p>
+                            <p className="text-xs text-slate-500">
+                                {p.status === 'playing' ? t('In Match') : p.status === 'searching' ? t('Searching...') : t('Online')}
+                            </p>
                         </div>
                         {p.status === 'searching' && (
                             <div className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">

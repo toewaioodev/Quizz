@@ -170,5 +170,30 @@
     "Exit": "Exit",
     "SCORE": "SCORE",
     "Loading questions...": "Loading questions...",
-    "Streak!": "Streak!"
+    "Streak!": "Streak!",
+    "Opponent has answered!": "Opponent has answered!",
+
+    "Game Invitation": "Game Invitation",
+    "has challenged you to a battle!": "has challenged you to a battle!",
+    "Decline": "Decline",
+    "Accept": "Accept",
+    "Joining...": "Joining...",
+
+    "Profile Information": "Profile Information",
+    "Update your account's profile information and settings.": "Update your account's profile information and settings.",
+    "Profile Photo URL": "Profile Photo URL",
+    "Name": "Name",
+    "Email": "Email",
+    "App Settings": "App Settings",
+    "Customize your experience within the application.": "Customize your experience within the application.",
+    "Default Difficulty": "Default Difficulty",
+    "Easy": "Easy",
+    "Medium": "Medium",
+    "Hard": "Hard",
+    "This difficulty will be selected by default when you start a quiz.": "This difficulty will be selected by default when you start a quiz.",
+    "Save": "Save",
+    "Saved.": "Saved.",
+    "Appearance": "Appearance",
+    "Language": "Language",
+    "Profile": "Profile"
 }

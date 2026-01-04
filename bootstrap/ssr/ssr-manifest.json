@@ -1,67 +1,67 @@
 {
   "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
   "resources/js/Components/ArenaHeader.tsx": [
-    "/build/assets/Arena-CNHjfqNE.js"
+    "/build/assets/Arena-BUK_jAjt.js"
   ],
   "resources/js/Components/DropDown.tsx": [
-    "/build/assets/Navbar-Ctort6BS.js"
+    "/build/assets/Navbar-ClTv28i5.js"
   ],
   "resources/js/Components/LanguageSwitcher.tsx": [
-    "/build/assets/Navbar-Ctort6BS.js"
+    "/build/assets/Navbar-ClTv28i5.js"
   ],
   "resources/js/Components/Navbar.tsx": [
-    "/build/assets/Navbar-Ctort6BS.js"
+    "/build/assets/Navbar-ClTv28i5.js"
   ],
   "resources/js/Components/ThemeSwitcher.tsx": [
     "/build/assets/ThemeSwitcher-C4YGyEOA.js"
   ],
   "resources/js/hooks/useGameEngine.ts": [
-    "/build/assets/Arena-CNHjfqNE.js"
+    "/build/assets/Arena-BUK_jAjt.js"
   ],
   "resources/js/pages/About.tsx": [
-    "/build/assets/About-D0xV6Tsb.js"
+    "/build/assets/About-BEZ_4-PK.js"
   ],
   "resources/js/pages/Arena.tsx": [
-    "/build/assets/Arena-CNHjfqNE.js"
+    "/build/assets/Arena-BUK_jAjt.js"
   ],
   "resources/js/pages/Auth/Login.tsx": [
-    "/build/assets/Login-BFGxO-yH.js"
+    "/build/assets/Login-CNZe5lmm.js"
   ],
   "resources/js/pages/Auth/Register.tsx": [
-    "/build/assets/Register-ezw_pTUL.js"
+    "/build/assets/Register-BqjDum0s.js"
   ],
   "resources/js/pages/Dashboard.tsx": [
-    "/build/assets/Dashboard-S5aIEa9P.js"
+    "/build/assets/Dashboard-w4GVquy5.js"
   ],
   "resources/js/pages/FAQ.tsx": [
-    "/build/assets/FAQ-EwjEe52q.js"
+    "/build/assets/FAQ-dv5cSGrR.js"
   ],
   "resources/js/pages/Features.tsx": [
-    "/build/assets/Features--wOZ1wOY.js"
+    "/build/assets/Features-CkdwZx9M.js"
   ],
   "resources/js/pages/Leaderboard/Index.tsx": [
-    "/build/assets/Index-B9gv_0GA.js"
+    "/build/assets/Index-COwV2IV7.js"
   ],
   "resources/js/pages/Lobby.tsx": [
-    "/build/assets/Lobby-6E0hS97V.js"
+    "/build/assets/Lobby-D6BysWn0.js"
   ],
   "resources/js/pages/Pricing.tsx": [
-    "/build/assets/Pricing-CgbJKH_H.js"
+    "/build/assets/Pricing-DaI5GaOB.js"
   ],
   "resources/js/pages/Privacy.tsx": [
-    "/build/assets/Privacy-DeqGocFR.js"
+    "/build/assets/Privacy-DwdNZYC-.js"
   ],
   "resources/js/pages/Profile/Show.tsx": [
-    "/build/assets/Show-Bio6hAAc.js"
+    "/build/assets/Show-2EsYkeZ4.js"
   ],
   "resources/js/pages/Quiz/CategoryQuiz.tsx": [
-    "/build/assets/CategoryQuiz-BB3ZQLtK.js"
+    "/build/assets/CategoryQuiz-DpYV6Fjk.js"
   ],
   "resources/js/pages/Terms.tsx": [
-    "/build/assets/Terms-C9fik27f.js"
+    "/build/assets/Terms-D6l0sVa4.js"
   ],
   "resources/js/pages/welcome.tsx": [
-    "/build/assets/welcome-BGjH-ak5.js"
+    "/build/assets/welcome-Ch9l5sc1.js"
   ],
   "resources/js/ssr.tsx": []
 }

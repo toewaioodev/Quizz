@@ -17,7 +17,7 @@ export default function Navbar() {
         <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900/80">
             <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo & Brand */}
-                <Link href="/lobby" className="group flex items-center space-x-3">
+                <Link href="/home" className="group flex items-center space-x-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 text-xl font-bold text-white shadow-lg shadow-blue-500/20 transition-transform group-hover:scale-105">
                         Q
                     </div>
@@ -93,7 +93,7 @@ export default function Navbar() {
                 </div>
 
                 {/* Mobile Menu Button */}
-                <div className="flex gap-3 md:hidden items-center">
+                <div className="flex items-center gap-3 md:hidden">
                     <LanguageSwitcher />
                     <ThemeSwitcher />
 
@@ -113,7 +113,7 @@ export default function Navbar() {
                 <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm dark:bg-black/50" />
                 <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 transition-transform duration-300 ease-in-out sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 dark:bg-slate-900">
                     <div className="flex items-center justify-between">
-                        <Link href="/lobby" className="-m-1.5 flex items-center space-x-3 p-1.5">
+                        <Link href="/welcome" className="-m-1.5 flex items-center space-x-3 p-1.5">
                             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-tr from-blue-600 to-purple-600 text-lg font-bold text-white">
                                 Q
                             </div>
@@ -137,11 +137,11 @@ export default function Navbar() {
 
                             <div className="space-y-4 py-6">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-base leading-7 font-semibold text-gray-900 dark:text-white">Appearance</span>
+                                    <span className="text-base leading-7 font-semibold text-gray-900 dark:text-white">{t('Appearance')}</span>
                                     <ThemeSwitcher />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-base leading-7 font-semibold text-gray-900 dark:text-white">Language</span>
+                                    <span className="text-base leading-7 font-semibold text-gray-900 dark:text-white">{t('Language')}</span>
                                     <LanguageSwitcher />
                                 </div>
 
@@ -162,7 +162,7 @@ export default function Navbar() {
                                             href="/profile"
                                             className="-mx-3 block rounded-lg px-3 py-2.5 text-base leading-7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800"
                                         >
-                                            Profile
+                                            {t('Profile')}
                                         </Link>
                                         <Link
                                             href="/logout"

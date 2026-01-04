@@ -40,6 +40,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/lobby', [GameController::class, 'lobby'])->name('lobby');
+    Route::post('/match/invite', [GameController::class, 'invite'])->name('match.invite');
+    Route::post('/match/{id}/accept', [GameController::class, 'acceptInvite'])->name('match.accept');
     Route::post('/match/find', [GameController::class, 'findMatch'])->name('match.find');
     Route::get('/arena/{id}', [GameController::class, 'arena'])->name('arena');
     Route::post('/match/{id}/start', [GameController::class, 'startMatch'])->name('match.start');
@@ -50,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
     // Solo Quiz
     Route::post('/quiz/answer', [QuizController::class, 'answer']);
     Route::post('/quiz/generate', [QuizController::class, 'generate'])->name('quiz.generate');
+    Route::get('/quiz/category/{id}', [QuizController::class, 'showCategoryQuiz'])->name('quiz.category');
 
     // Leaderboard
     // Leaderboard

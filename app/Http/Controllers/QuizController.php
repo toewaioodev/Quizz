@@ -129,4 +129,22 @@ class QuizController extends Controller
             'new_total_points' => $user->points
         ]);
     }
+    public function showCategoryQuiz($categoryId)
+    {
+        $categoryMap = [
+            'math' => 'Mathematics',
+            'science' => 'Science',
+            'history' => 'History',
+            'geo' => 'Geography',
+            'tech' => 'Technology',
+            'arts' => 'Arts & Lit',
+        ];
+
+        $categoryName = $categoryMap[$categoryId] ?? ucfirst($categoryId);
+
+        return \Inertia\Inertia::render('Quiz/CategoryQuiz', [
+            'categoryId' => $categoryId,
+            'categoryName' => $categoryName,
+        ]);
+    }
 }

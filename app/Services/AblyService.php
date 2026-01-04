@@ -31,7 +31,7 @@ class AblyService
             $channel->publish($eventName, $data);
             return true;
         } catch (Exception $e) {
-            // Log error
+            \Illuminate\Support\Facades\Log::error("Ably Publish Error: " . $e->getMessage());
             return false;
         }
     }

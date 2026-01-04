@@ -29,9 +29,7 @@ class GameController extends Controller
 
     public function lobby()
     {
-        return Inertia::render('Lobby', [
-            'ably_key' => config('services.ably.key'),
-        ]);
+        return Inertia::render('Lobby');
     }
 
 
@@ -47,6 +45,83 @@ class GameController extends Controller
         $result = $this->matchmakingService->findOrCreateMatch($user);
         
         return response()->json($result);
+    }
+
+    public function invite(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $inviter = $request->user();
+        $inviteeId = $request->user_id;
+
+        if ($inviter->id == $inviteeId) {
+            return response()->json(['message' => 'You cannot invite yourself.'], 400);
+        }
+
+        // Create a match for the inviter if they aren't in one (or use matchmaking logic)
+        // For simplicity, we'll create a pending match or use findOrCreateMatch logic
+        // But specifically for direct invite, we might want a specific match type or status.
+        // Let's reuse findOrCreateMatch but we need to ensure it doesn't just put them in a random queue if possible.
+        // Actually, for direct invite, we probably want to create a specific match that waits for this user.
+        // But for now, to keep it simple and compatible, let's just assume we create a match 
+        // and tell the other user "Join this match ID".
+        
+        // Let's create a new specific match for these two? 
+        // Or just let the inviter create a match and wait.
+        
+        $match = QuizMatch::create([
+            'player1_id' => $inviter->id,
+            'status' => 'pending', // Waiting for P2
+            'channel_id' => Str::uuid(),
+        ]);
+        
+        // Send Ably message to invitee
+        $this->ablyService->publish("private-user-{$inviteeId}", 'invite', [
+            'match_id' => $match->id,
+            'inviter_name' => $inviter->name,
+            'inviter_id' => $inviter->id,
+            'inviter_avatar' => $inviter->profile_photo_url,
+        ]);
+
+        return response()->json(['match_id' => $match->id]);
+    }
+
+    public function acceptInvite(Request $request, $id)
+    {
+        $match = QuizMatch::findOrFail($id);
+        $user = $request->user();
+
+        // Basic validation
+        if ($match->status !== 'pending') {
+             return response()->json(['message' => 'Match is no longer pending.'], 400);
+        }
+        
+        if ($match->player2_id !== null && $match->player2_id !== $user->id) {
+             return response()->json(['message' => 'Match is full.'], 400);
+        }
+
+        // Join match
+        $match->update([
+            'player2_id' => $user->id,
+            'status' => 'active',
+        ]);
+
+        // Notify Inviter (Player 1)
+        $this->ablyService->publish("private-user-{$match->player1_id}", 'match-accepted', [
+            'match_id' => $match->id,
+            'opponent_name' => $user->name,
+        ]);
+        
+        // Start Game
+        try {
+            $this->gameStateService->startGame($match);
+        } catch (\Exception $e) {
+            Log::error("Failed to start game on accept: " . $e->getMessage());
+        }
+
+        return response()->json(['status' => 'joined', 'match_id' => $match->id]);
     }
 
     public function startMatch(Request $request, $id)

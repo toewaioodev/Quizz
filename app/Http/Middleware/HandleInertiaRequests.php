@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
+            'ably_key' => config('services.ably.key'),
             'auth' => [
                 'user' => $request->user(),
             ],

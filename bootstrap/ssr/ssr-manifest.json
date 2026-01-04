@@ -1,5 +1,8 @@
 {
   "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
+  "resources/js/Components/ArenaHeader.tsx": [
+    "/build/assets/Arena-CzKiy0OX.js"
+  ],
   "resources/js/Components/DropDown.tsx": [
     "/build/assets/Navbar-Ctort6BS.js"
   ],
@@ -13,13 +16,13 @@
     "/build/assets/ThemeSwitcher-C4YGyEOA.js"
   ],
   "resources/js/hooks/useGameEngine.ts": [
-    "/build/assets/Arena-BJ2HIY2O.js"
+    "/build/assets/Arena-CzKiy0OX.js"
   ],
   "resources/js/pages/About.tsx": [
     "/build/assets/About-D0xV6Tsb.js"
   ],
   "resources/js/pages/Arena.tsx": [
-    "/build/assets/Arena-BJ2HIY2O.js"
+    "/build/assets/Arena-CzKiy0OX.js"
   ],
   "resources/js/pages/Auth/Login.tsx": [
     "/build/assets/Login-BFGxO-yH.js"
@@ -28,7 +31,7 @@
     "/build/assets/Register-ezw_pTUL.js"
   ],
   "resources/js/pages/Dashboard.tsx": [
-    "/build/assets/Dashboard-BDeAIlMd.js"
+    "/build/assets/Dashboard-S5aIEa9P.js"
   ],
   "resources/js/pages/FAQ.tsx": [
     "/build/assets/FAQ-EwjEe52q.js"
@@ -40,7 +43,7 @@
     "/build/assets/Index-B9gv_0GA.js"
   ],
   "resources/js/pages/Lobby.tsx": [
-    "/build/assets/Lobby-22Z_6Ani.js"
+    "/build/assets/Lobby-6E0hS97V.js"
   ],
   "resources/js/pages/Pricing.tsx": [
     "/build/assets/Pricing-CgbJKH_H.js"
@@ -50,6 +53,9 @@
   ],
   "resources/js/pages/Profile/Show.tsx": [
     "/build/assets/Show-Bio6hAAc.js"
+  ],
+  "resources/js/pages/Quiz/CategoryQuiz.tsx": [
+    "/build/assets/CategoryQuiz-D5YMOt8k.js"
   ],
   "resources/js/pages/Terms.tsx": [
     "/build/assets/Terms-C9fik27f.js"

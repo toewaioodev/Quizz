@@ -6,6 +6,7 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    ably_key: string;
     [key: string]: unknown;
 }
 

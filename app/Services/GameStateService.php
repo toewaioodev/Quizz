@@ -126,7 +126,11 @@ class GameStateService
                 $timeTaken = abs($diffInSeconds); 
                 $timeRemaining = max(15 - $timeTaken, 0);
                 
-                $points = (int) round($timeRemaining * 10);
+                // Base 50 + Time Bonus (Match Score)
+                $points = 50 + (int) round($timeRemaining * 10);
+
+                // Give Global Points immediately for correct answer
+                User::where('id', $userId)->increment('points', 15);
             }
     
             // Update Score State in memory
@@ -149,7 +153,10 @@ class GameStateService
             
             // Check if both answered (Atomic check inside transaction)
             if (count($answers) >= 2) {
+                Log::info("Both players answered match {$match->id}. Concluding round.");
                 $this->concludeRound($match);
+            } else {
+                Log::info("Player {$playerKey} answered match {$match->id}. Waiting for opponent. Count: " . count($answers));
             }
     
             return [
@@ -250,14 +257,22 @@ class GameStateService
         
         // Update User stats
         if ($winnerId) {
-            User::where('id', $winnerId)->increment('points', 50);
+            User::where('id', $winnerId)->increment('points', 30); // Win Bonus
             User::where('id', $winnerId)->increment('wins', 1);
             
             $loserId = ($winnerId == $match->player1_id) ? $match->player2_id : $match->player1_id;
             if ($loserId) {
-                User::where('id', $loserId)->decrement('points', 10);
+                // No penalty, just no win bonus. They kept their answer points.
+                // Or maybe small penalty to enforce risk?
+                // Let's remove penalty to be friendlier, or keep small one.
+                // User said "distribution wrong", penalties feel wrong.
+                // I will REMOVE penalty.
                 User::where('id', $loserId)->increment('losses', 1);
             }
+        } else {
+            // TIE
+             User::where('id', $match->player1_id)->increment('points', 10);
+             User::where('id', $match->player2_id)->increment('points', 10);
         }
 
         $this->ablyService->publish(

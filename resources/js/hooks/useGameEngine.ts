@@ -30,6 +30,7 @@ interface State {
     winnerId: number | null;
     opponentAnswered: boolean;
     hasAnswered: boolean;
+    userAnswer: string | null;
     opponent: any | null;
 }
 
@@ -39,7 +40,7 @@ type Action =
     | { type: 'NEW_QUESTION'; payload: Question }
     | { type: 'TICK_TIMER' }
     | { type: 'OPPONENT_ANSWERED' }
-    | { type: 'PLAYER_ANSWERED' }
+    | { type: 'PLAYER_ANSWERED'; payload: string }
     | { type: 'ROUND_RESULT'; payload: any }
     | { type: 'GAME_OVER'; payload: any };
 
@@ -52,6 +53,7 @@ const initialState: State = {
     winnerId: null,
     opponentAnswered: false,
     hasAnswered: false,
+    userAnswer: null,
     opponent: null,
 };
 
@@ -82,6 +84,7 @@ function reducer(state: State, action: Action): State {
                 currentQuestion: action.payload,
                 timer: action.payload.time_limit,
                 hasAnswered: false,
+                userAnswer: null, // Reset user answer
                 opponentAnswered: false,
                 lastRoundResult: null, // Clear previous
             };
@@ -90,7 +93,7 @@ function reducer(state: State, action: Action): State {
         case 'OPPONENT_ANSWERED':
             return { ...state, opponentAnswered: true };
         case 'PLAYER_ANSWERED':
-            return { ...state, hasAnswered: true };
+            return { ...state, hasAnswered: true, userAnswer: action.payload };
         case 'ROUND_RESULT':
             return {
                 ...state,
@@ -137,7 +140,7 @@ export function useGameEngine(matchId: number, channelId: string, userId: number
                 dispatch({ type: 'ROUND_RESULT', payload: message.data });
                 // Auto advance if host?
                 if (isHost) {
-                    setTimeout(() => nextQuestion(), 3000);
+                    setTimeout(() => nextQuestion(), 1500);
                 }
                 break;
             case 'game:over':
@@ -196,7 +199,7 @@ export function useGameEngine(matchId: number, channelId: string, userId: number
 
     const submitAnswer = async (option: string) => {
         if (state.hasAnswered) return;
-        dispatch({ type: 'PLAYER_ANSWERED' });
+        dispatch({ type: 'PLAYER_ANSWERED', payload: option });
         try {
             await axios.post(`/match/${matchId}/answer`, {
                 question_id: state.currentQuestion?.question_id,

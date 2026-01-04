@@ -1,24 +1,21 @@
-import * as Ably from 'ably';
-import { AblyProvider, ChannelProvider, usePresence, usePresenceListener } from 'ably/react';
-
+import ArenaHeader from '@/Components/ArenaHeader';
 import ThemeSwitcher from '@/Components/ThemeSwitcher';
+import { useGameEngine } from '@/hooks/useGameEngine';
 import { Head, usePage } from '@inertiajs/react';
-import { useEffect, useMemo, useState } from 'react';
+import { AblyProvider, ChannelProvider, useChannel, usePresence, usePresenceListener } from 'ably/react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SharedData } from '../types';
-import { useGameEngine } from '@/hooks/useGameEngine';
 
 // Wrapper to provide Ably Context
 export default function ArenaPage({ match, ably_key }: { match: any; ably_key: string }) {
-    const user = usePage<SharedData>().props.auth.user;
-    const client = useMemo(() => new Ably.Realtime({ key: ably_key, clientId: String(user.id) }), [ably_key, user.id]);
-
+    // We use the global Ably client provided by GlobalAblyProvider
     return (
-        <AblyProvider client={client}>
-            <ChannelProvider channelName={`match:${match.channel_id}`}>
+        <ChannelProvider channelName={`match:${match.channel_id}`}>
+            <ChannelProvider channelName="global-presence">
                 <Arena match={match} />
             </ChannelProvider>
-        </AblyProvider>
+        </ChannelProvider>
     );
 }
 
@@ -31,10 +28,7 @@ function Arena({ match }: { match: any }) {
     // otherwise fallback to prop (initial load for P2) or null (initial load for P1)
     const initialOpponent = match.player1_id === user.id ? match.player2 : match.player1;
 
-    // We don't need local state for opponent if we derive it from props + hook state
-    // But to keep it simple, let's derive it.
-
-    const isHost = match.player1_id === user.id;
+    const isHost = Number(match.player1_id) === Number(user.id);
 
     // Use Game Engine Hook
     const { state, startGame, submitAnswer, nextQuestion } = useGameEngine(
@@ -47,7 +41,7 @@ function Arena({ match }: { match: any }) {
     // Effective Opponent
     const opponent = state.opponent || initialOpponent;
 
-    // Presence Logic for "Opponent Online" status
+    // Presence Logic for "Opponent Online" status in the match channel
     usePresence(`match:${match.channel_id}`);
     const { presenceData } = usePresenceListener(`match:${match.channel_id}`);
     const [opponentPresent, setOpponentPresent] = useState(false);
@@ -56,6 +50,31 @@ function Arena({ match }: { match: any }) {
         const isOpponentHere = presenceData.some((p: any) => p.clientId === String(opponent?.id));
         setOpponentPresent(isOpponentHere);
     }, [presenceData, opponent]);
+
+    // Handle Global Presence Status (Playing)
+    const { channel: globalChannel } = useChannel('global-presence');
+
+    useEffect(() => {
+        if (globalChannel) {
+            // Update status to playing
+            globalChannel.presence.update({
+                name: user.name,
+                id: user.id,
+                profile_photo_url: user.profile_photo_url,
+                status: 'playing',
+            });
+
+            return () => {
+                // Revert to online when leaving arena
+                globalChannel.presence.update({
+                    name: user.name,
+                    id: user.id,
+                    profile_photo_url: user.profile_photo_url,
+                    status: 'online',
+                });
+            };
+        }
+    }, [globalChannel, user]);
 
 
     // Derived UI State
@@ -82,91 +101,16 @@ function Arena({ match }: { match: any }) {
             </div>
 
             {/* Header / StatusBar */}
-            <div className="sticky top-0 z-10 mx-auto flex w-full max-w-6xl flex-row items-center justify-between border-b border-slate-200 bg-white/50 p-4 backdrop-blur-sm md:static md:border-none md:bg-transparent dark:border-white/5 dark:bg-black/20">
-                {/* Player 1 (You) */}
-                <div className={`flex items-center gap-3 transition-all duration-300 ${score > opponentScore ? 'scale-105' : 'scale-100'}`}>
-                    <div className="relative">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-500 to-blue-700 text-lg font-bold text-white shadow-lg shadow-blue-500/30 md:h-16 md:w-16 md:text-xl dark:border-slate-800 overflow-hidden">
-                            <img src={user.profile_photo_url} alt={user.name} className="w-full h-full object-cover" />
-                        </div>
-                        <div className="absolute -right-1 -bottom-1 rounded-full border border-white bg-slate-900 px-1.5 py-0.5 text-[10px] font-bold text-white md:text-xs dark:border-slate-800">
-                            YOU
-                        </div>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="max-w-[80px] truncate text-sm font-bold md:max-w-[150px] md:text-lg">{user.name}</span>
-                        <span className="text-xl leading-none font-black text-blue-600 md:text-3xl dark:text-blue-400">{score}</span>
-                    </div>
-                </div>
-
-                {/* VS / Timer Centerpiece */}
-                <div className="flex flex-col items-center">
-                    {state.status === 'QUESTION_ACTIVE' || state.status === 'ROUND_RESULT' ? (
-                        <div
-                            className={`relative flex h-16 w-16 items-center justify-center rounded-full border-4 shadow-xl transition-all duration-300 md:h-20 md:w-20 ${timer <= 5 ? 'scale-110 border-red-500 bg-red-500/10' : 'border-white bg-white dark:border-slate-700 dark:bg-slate-800'}`}
-                        >
-                            <span className={`text-2xl font-black md:text-4xl ${timer <= 5 ? 'text-red-500' : 'text-slate-800 dark:text-white'}`}>
-                                {timer}
-                            </span>
-                            <svg className="pointer-events-none absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 100 100">
-                                <circle
-                                    className="stroke-current text-slate-200 opacity-20 dark:text-slate-700"
-                                    strokeWidth="8"
-                                    cx="50"
-                                    cy="50"
-                                    r="40"
-                                    fill="transparent"
-                                />
-                                <circle
-                                    className={`stroke-current transition-all duration-1000 ease-linear ${timer <= 5 ? 'text-red-500' : 'text-blue-500'}`}
-                                    strokeWidth="8"
-                                    strokeLinecap="round"
-                                    cx="50"
-                                    cy="50"
-                                    r="40"
-                                    fill="transparent"
-                                    strokeDasharray="251.2"
-                                    strokeDashoffset={251.2 - (251.2 * timer) / 15}
-                                />
-                            </svg>
-                        </div>
-                    ) : (
-                        <div className="text-2xl font-black text-slate-300 italic md:text-4xl dark:text-slate-700">
-                            {state.status === 'STARTING' ? 'VS' : state.status === 'WAITING_FOR_OPPONENT' ? t('WAITING') : ''}
-                        </div>
-                    )}
-                    <div className="mt-1 text-[10px] font-bold tracking-widest text-slate-400 uppercase md:text-xs">
-                        {currentQuestion ? `${t('Round')} ${currentQuestion.round_index}/5` : ''}
-                    </div>
-                </div>
-
-                {/* Player 2 (Opponent) */}
-                <div
-                    className={`flex flex-row-reverse items-center gap-3 text-right transition-all duration-300 ${opponentScore > score ? 'scale-105' : 'scale-100'}`}
-                >
-                    <div className="relative">
-                        <div
-                            className={`flex h-12 w-12 items-center justify-center rounded-full border-2 border-white text-lg font-bold text-white shadow-lg md:h-16 md:w-16 md:text-xl dark:border-slate-800 overflow-hidden ${opponent ? 'bg-gradient-to-br from-red-500 to-red-700 shadow-red-500/30' : 'animate-pulse bg-slate-300 dark:bg-slate-800'}`}
-                        >
-                            {opponent ? (
-                                <img src={opponent.profile_photo_url || `https://ui-avatars.com/api/?name=${opponent.name}&color=7F9CF5&background=EBF4FF`} alt={opponent.name} className="w-full h-full object-cover" />
-                            ) : '?'}
-                        </div>
-                        {/* Presence Dot */}
-                        {opponent && (
-                            <div
-                                className={`absolute -bottom-0 -left-0 h-4 w-4 rounded-full border-2 border-white dark:border-slate-800 ${opponentPresent ? 'bg-green-500' : 'bg-gray-400'}`}
-                            />
-                        )}
-                    </div>
-                    <div className="flex flex-col items-end">
-                        <span className="max-w-[80px] truncate text-sm font-bold md:max-w-[150px] md:text-lg">
-                            {opponent ? opponent.name : t('...')}
-                        </span>
-                        <span className="text-xl leading-none font-black text-red-500 md:text-3xl dark:text-red-400">{opponentScore}</span>
-                    </div>
-                </div>
-            </div>
+            <ArenaHeader
+                user={user}
+                opponent={opponent}
+                score={score}
+                opponentScore={opponentScore}
+                timer={timer}
+                currentQuestionIndex={currentQuestion?.round_index}
+                status={state.status}
+                opponentPresent={opponentPresent}
+            />
 
             {/* Main Game Area */}
             <div className="z-10 flex w-full max-w-4xl flex-1 flex-col justify-center p-2 md:p-4">
@@ -209,99 +153,172 @@ function Arena({ match }: { match: any }) {
 
                     {/* Question / Result State */}
                     {(state.status === 'QUESTION_ACTIVE' || state.status === 'ROUND_RESULT') && currentQuestion && (
-                        <div className="animate-in slide-in-from-bottom-8 flex flex-1 flex-col space-y-8 p-6 duration-500 md:p-10">
-                            <div className="space-y-4 text-center">
-                                <span className="inline-block rounded-full border border-blue-200 bg-blue-100 px-4 py-1.5 text-xs font-bold tracking-widest text-blue-600 uppercase dark:border-blue-500/20 dark:bg-blue-900/30 dark:text-blue-400">
-                                    {currentQuestion.category}
-                                </span>
-                                <h2 className="text-2xl leading-tight font-bold text-slate-800 md:text-4xl md:leading-tight dark:text-slate-100">
-                                    {currentQuestion.text}
-                                </h2>
-                            </div>
-
-                            <div className="mt-auto grid w-full grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
-                                {currentQuestion.options.map((opt, idx) => {
-                                    // Visual Logic
-                                    const isSelected = false; // We don't verify selection visually here anymore unless we track it locally
-                                    const isCorrect = state.lastRoundResult?.correct_option === opt;
-                                    const showResult = state.status === 'ROUND_RESULT';
-
-                                    let btnClass = 'border-slate-200 bg-white text-slate-700 hover:-translate-y-1 hover:border-blue-500 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200';
-
-                                    if (state.hasAnswered) {
-                                        // Optimistic selection state could be added here
-                                        // For now, if answered, we just disable and show neutral
-                                        btnClass = 'border-transparent bg-slate-100 text-slate-400 opacity-50 dark:bg-slate-800/50';
-                                    }
-
-                                    if (showResult) {
-                                        if (isCorrect) {
-                                            btnClass = 'scale-[1.02] border-green-600 bg-green-500 text-white shadow-lg shadow-green-500/20 opacity-100';
-                                        }
-                                    }
-
-                                    return (
-                                        <button
-                                            key={idx}
-                                            onClick={() => submitAnswer(opt)}
-                                            disabled={state.hasAnswered || showResult}
-                                            className={`group relative rounded-2xl border-2 p-4 text-left transition-all duration-200 md:p-6 ${btnClass}`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <span
-                                                    className={`flex h-8 w-8 items-center justify-center rounded-lg border text-sm font-bold ${showResult && isCorrect ? 'border-white/40 bg-white/20 text-white' : 'border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-600 dark:bg-slate-700'}`}
-                                                >
-                                                    {String.fromCharCode(65 + idx)}
-                                                </span>
-                                                <span className="text-lg font-semibold">{opt}</span>
-                                            </div>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Opponent Answered Indicator */}
-                            {state.opponentAnswered && !state.lastRoundResult && (
-                                <div className="text-center text-sm font-bold text-red-500 animate-pulse">
-                                    {t('Opponent has answered!')}
-                                </div>
-                            )}
-                        </div>
+                        <QuestionDisplay
+                            currentQuestion={currentQuestion}
+                            status={state.status}
+                            lastRoundResult={state.lastRoundResult}
+                            hasAnswered={state.hasAnswered}
+                            opponentAnswered={state.opponentAnswered}
+                            submitAnswer={submitAnswer}
+                            userAnswer={state.userAnswer}
+                        />
                     )}
 
                     {/* Game Over State */}
                     {state.status === 'GAME_OVER' && (
-                        <div className="animate-in zoom-in flex flex-1 flex-col items-center justify-center space-y-8 p-8 text-center duration-500">
-                            <h1 className="text-4xl font-black tracking-tight text-slate-900 uppercase md:text-6xl dark:text-white">
-                                {t('GAME OVER')}
-                            </h1>
-
-                            <div className="flex w-full items-end justify-center gap-8 md:gap-16">
-                                {/* Result Avatars similar to before */}
-                                <div className="flex flex-col items-center">
-                                    <div className="text-5xl font-black">{score}</div>
-                                    <div className="text-sm">YOU</div>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <div className="text-5xl font-black">{opponentScore}</div>
-                                    <div className="text-sm">OPPONENT</div>
-                                </div>
-                            </div>
-
-                            <div className="pt-8 text-3xl font-bold">
-                                {isWinner ? <span className="text-green-500">VICTORY!</span> : isDraw ? <span className="text-yellow-500">DRAW</span> : <span className="text-red-500">DEFEAT</span>}
-                            </div>
-
-                            <button
-                                onClick={() => (window.location.href = '/dashboard')}
-                                className="rounded-2xl bg-slate-900 px-8 py-4 font-bold text-white shadow-xl hover:scale-105 dark:bg-white dark:text-slate-900"
-                            >
-                                {t('Back to Dashboard')}
-                            </button>
-                        </div>
+                        <GameOverDisplay
+                            score={score}
+                            opponentScore={opponentScore}
+                            isWinner={isWinner}
+                            isDraw={isDraw}
+                        />
                     )}
                 </div>
             </div>
         </div>
     );
 }
+
+const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAnswered, opponentAnswered, submitAnswer, userAnswer }: any) => {
+    const { t } = useTranslation();
+
+    // Animation delay for staggered reveal
+    const getDelay = (index: number) => `${index * 100}ms`;
+
+    return (
+        <div className="flex flex-1 flex-col p-4 md:p-8 w-full max-w-4xl mx-auto">
+            {/* Question Card */}
+            <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 p-1 shadow-lg backdrop-blur-md dark:from-indigo-500/5 dark:to-purple-500/5">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient-x"></div>
+                <div className="relative rounded-xl bg-white/50 p-6 text-center dark:bg-slate-900/50 md:p-10">
+                    <span className="mb-4 inline-block rounded-full bg-blue-100 px-4 py-1 text-xs font-bold tracking-widest text-blue-700 uppercase dark:bg-blue-900/30 dark:text-blue-300">
+                        {currentQuestion.category}
+                    </span>
+                    <h2 className="text-2xl font-black tracking-tight text-slate-800 md:text-4xl md:leading-snug dark:text-slate-100">
+                        {currentQuestion.text}
+                    </h2>
+                </div>
+            </div>
+
+            {/* Options Grid */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+                {currentQuestion.options.map((opt: string, idx: number) => {
+                    const isSelected = userAnswer === opt;
+                    const isCorrect = lastRoundResult?.correct_option === opt;
+                    const showResult = status === 'ROUND_RESULT';
+
+                    let buttonStyle = "border-slate-200 bg-white/80 text-slate-700 hover:border-blue-400 hover:bg-blue-50/50 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-900/20";
+                    let icon = <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-current opacity-70 text-sm font-bold transition-all group-hover:bg-current group-hover:text-white group-hover:border-transparent">{String.fromCharCode(65 + idx)}</span>;
+
+                    if (hasAnswered) {
+                        buttonStyle = "border-slate-200 bg-slate-50 text-slate-400 cursor-default dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-600";
+                        if (isSelected) {
+                            buttonStyle = "border-blue-500 bg-blue-100/50 text-blue-700 dark:border-blue-500 dark:bg-blue-900/30 dark:text-blue-300";
+                            icon = <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-white"><svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>;
+                        }
+                    }
+
+                    if (showResult) {
+                        if (isCorrect) {
+                            buttonStyle = "border-green-500 bg-green-100 text-green-800 shadow-[0_0_20px_rgba(34,197,94,0.3)] scale-[1.02] z-10 dark:border-green-500 dark:bg-green-900/30 dark:text-green-300";
+                            icon = <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500 text-white"><svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg></div>;
+                        } else if (isSelected) {
+                            buttonStyle = "border-red-500 bg-red-100 text-red-800 opacity-80 dark:border-red-500 dark:bg-red-900/30 dark:text-red-300";
+                            icon = <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500 text-white"><svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg></div>;
+                        } else {
+                            buttonStyle = "grayscale opacity-50 border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50";
+                        }
+                    }
+
+                    return (
+                        <button
+                            key={idx}
+                            onClick={() => submitAnswer(opt)}
+                            disabled={hasAnswered || showResult}
+                            className={`group relative flex items-center gap-4 overflow-hidden rounded-2xl border-2 p-5 text-left transition-all duration-300 shadow-sm ${buttonStyle}`}
+                            style={{ animationDelay: getDelay(idx) }}
+                        >
+                            <div className="shrink-0">{icon}</div>
+                            <span className="text-lg font-bold tracking-tight md:text-xl">{opt}</span>
+
+                            {/* Hover Gradient Effect */}
+                            {!hasAnswered && !showResult && (
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]"></div>
+                            )}
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* Opponent Answered Indicator */}
+            {opponentAnswered && !lastRoundResult && (
+                <div className="mt-8 flex justify-center">
+                    <div className="flex items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-red-600 animate-pulse dark:bg-red-900/30 dark:text-red-400">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                        {t('Opponent has answered!')}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+});
+
+import confetti from 'canvas-confetti';
+
+const GameOverDisplay = memo(({ score, opponentScore, isWinner, isDraw }: any) => {
+    const { t } = useTranslation();
+
+    useEffect(() => {
+        if (isWinner) {
+            // Victory Sound
+            const audio = new Audio('/sounds/victory.mp3');
+            audio.play().catch(e => console.log("Audio play failed", e));
+
+            // Confetti
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b']
+            });
+        } else if (!isDraw) {
+            // Defeat Sound
+            const audio = new Audio('/sounds/defeat.mp3');
+            audio.play().catch(e => console.log("Audio play failed", e));
+        }
+    }, [isWinner, isDraw]);
+
+    return (
+        <div className="animate-in zoom-in flex flex-1 flex-col items-center justify-center space-y-8 p-8 text-center duration-500">
+            <h1 className="text-4xl font-black tracking-tight text-slate-900 uppercase md:text-6xl dark:text-white">
+                {t('GAME OVER')}
+            </h1>
+
+            <div className="flex w-full items-end justify-center gap-8 md:gap-16">
+                {/* Result Avatars similar to before */}
+                <div className="flex flex-col items-center">
+                    <div className="text-5xl font-black">{score}</div>
+                    <div className="text-sm">YOU</div>
+                </div>
+                <div className="flex flex-col items-center">
+                    <div className="text-5xl font-black">{opponentScore}</div>
+                    <div className="text-sm">OPPONENT</div>
+                </div>
+            </div>
+
+            <div className="pt-8 text-3xl font-bold">
+                {isWinner ? <span className="text-green-500">VICTORY!</span> : isDraw ? <span className="text-yellow-500">DRAW</span> : <span className="text-red-500">DEFEAT</span>}
+            </div>
+
+            <button
+                onClick={() => (window.location.href = '/dashboard')}
+                className="rounded-2xl bg-slate-900 px-8 py-4 font-bold text-white shadow-xl hover:scale-105 dark:bg-white dark:text-slate-900"
+            >
+                {t('Back to Dashboard')}
+            </button>
+        </div>
+    );
+});

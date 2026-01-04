@@ -1,60 +1,15 @@
 import { jsxs, jsx } from "react/jsx-runtime";
 import { usePage, Head, Link } from "@inertiajs/react";
-import axios from "axios";
-import React from "react";
 import { useTranslation } from "react-i18next";
 import { N as Navbar } from "./Navbar-Ctort6BS.js";
 import "@headlessui/react";
 import "@heroicons/react/24/outline";
+import "react";
 import "@heroicons/react/20/solid";
 import "./ThemeSwitcher-C4YGyEOA.js";
 function Dashboard({ categoryCounts }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const user = usePage().props.auth.user;
-  const [showQuizModal, setShowQuizModal] = React.useState(false);
-  const [currentCategory, setCurrentCategory] = React.useState(null);
-  const [currentQuestion, setCurrentQuestion] = React.useState(null);
-  const [quizResult, setQuizResult] = React.useState(null);
-  const [loadingQuestion, setLoadingQuestion] = React.useState(false);
-  const startQuiz = (category) => {
-    setCurrentCategory(category);
-    setShowQuizModal(true);
-    setQuizResult(null);
-    fetchQuestion(category.id);
-  };
-  const fetchQuestion = async (catId) => {
-    setLoadingQuestion(true);
-    setQuizResult(null);
-    try {
-      const res = await axios.post("/quiz/generate", {
-        topic: catId,
-        difficulty: user.settings?.difficulty || "medium",
-        // Use user preference or default
-        language: i18n.language ? i18n.language === "en-US" ? "en" : i18n.language : "my"
-        // Pass current language
-      });
-      setCurrentQuestion(res.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoadingQuestion(false);
-    }
-  };
-  const submitAnswer = async (option) => {
-    if (quizResult || !currentQuestion) return;
-    try {
-      const res = await axios.post("/quiz/answer", {
-        question_id: currentQuestion.id,
-        // Assuming response includes ID, otherwise need to adjust Controller
-        selected_option: option
-      });
-      setQuizResult(res.data);
-      if (res.data.correct) {
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
   const categories = [
     {
       id: "math",
@@ -199,9 +154,9 @@ function Dashboard({ categoryCounts }) {
       /* @__PURE__ */ jsxs("div", { children: [
         /* @__PURE__ */ jsx("h2", { className: "mb-6 flex items-center text-2xl font-bold", children: /* @__PURE__ */ jsx("span", { className: "bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent", children: t("Explore Categories") }) }),
         /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3", children: categories.map((cat) => /* @__PURE__ */ jsxs(
-          "div",
+          Link,
           {
-            onClick: () => startQuiz(cat),
+            href: `/quiz/category/${cat.id}`,
             className: "group relative flex min-h-[220px] transform cursor-pointer flex-col justify-end overflow-hidden rounded-2xl border border-slate-200/50 p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl dark:border-slate-700/50",
             children: [
               /* @__PURE__ */ jsxs("div", { className: "absolute inset-0", children: [
@@ -251,62 +206,7 @@ function Dashboard({ categoryCounts }) {
           cat.id
         )) })
       ] })
-    ] }),
-    showQuizModal && /* @__PURE__ */ jsx("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 p-4 backdrop-blur-sm", children: /* @__PURE__ */ jsxs("div", { className: "relative w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900", children: [
-      /* @__PURE__ */ jsx(
-        "button",
-        {
-          onClick: () => setShowQuizModal(false),
-          className: "absolute top-4 right-4 p-2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200",
-          children: /* @__PURE__ */ jsx("svg", { className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M6 18L18 6M6 6l12 12" }) })
-        }
-      ),
-      /* @__PURE__ */ jsxs("div", { className: "p-8", children: [
-        /* @__PURE__ */ jsxs("div", { className: "mb-6 flex items-center space-x-3", children: [
-          /* @__PURE__ */ jsx("span", { className: "text-3xl", children: currentCategory?.icon }),
-          /* @__PURE__ */ jsxs("h3", { className: "text-2xl font-bold", children: [
-            currentCategory?.name,
-            " Quiz"
-          ] })
-        ] }),
-        loadingQuestion ? /* @__PURE__ */ jsx("div", { className: "flex justify-center py-12", children: /* @__PURE__ */ jsx("div", { className: "h-10 w-10 animate-spin rounded-full border-4 border-blue-500/30 border-t-blue-500" }) }) : currentQuestion ? /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
-          /* @__PURE__ */ jsx("h4", { className: "text-xl leading-relaxed font-semibold", children: currentQuestion.question_text }),
-          /* @__PURE__ */ jsx("div", { className: "space-y-3", children: currentQuestion.options.map((opt, idx) => {
-            let btnClass = "w-full p-4 text-left rounded-xl border-2 transition-all font-medium ";
-            if (quizResult) {
-              if (opt === quizResult.correct_answer)
-                btnClass += "bg-green-100 border-green-500 text-green-700 dark:bg-green-900/30 dark:text-green-400 ";
-              else if (opt === quizResult.selected_option && !quizResult.correct)
-                btnClass += "bg-red-100 border-red-500 text-red-700 dark:bg-red-900/30 dark:text-red-400 ";
-              else btnClass += "border-slate-200 dark:border-slate-800 opacity-50 ";
-            } else {
-              btnClass += "border-slate-200 dark:border-slate-800 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 ";
-            }
-            return /* @__PURE__ */ jsx(
-              "button",
-              {
-                onClick: () => !quizResult && submitAnswer(opt),
-                disabled: !!quizResult,
-                className: btnClass,
-                children: opt
-              },
-              idx
-            );
-          }) }),
-          quizResult && /* @__PURE__ */ jsxs("div", { className: "animate-in slide-in-from-bottom-2 mt-6 flex items-center justify-between border-t border-slate-200 pt-6 dark:border-slate-800", children: [
-            /* @__PURE__ */ jsx("div", { className: `text-lg font-bold ${quizResult.correct ? "text-green-500" : "text-red-500"}`, children: quizResult.correct ? `${t("Correct!")} +${quizResult.points_earned} ${t("PTS")}` : t("Wrong Answer!") }),
-            /* @__PURE__ */ jsx(
-              "button",
-              {
-                onClick: () => fetchQuestion(currentCategory.id),
-                className: "rounded-lg bg-blue-600 px-6 py-2 font-bold text-white shadow-lg shadow-blue-500/30 transition-colors hover:bg-blue-700",
-                children: t("Next Question")
-              }
-            )
-          ] })
-        ] }) : /* @__PURE__ */ jsx("div", { className: "text-center text-red-400", children: t("Failed to load question.") })
-      ] })
-    ] }) })
+    ] })
   ] });
 }
 export {

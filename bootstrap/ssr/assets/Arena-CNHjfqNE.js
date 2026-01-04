@@ -370,17 +370,20 @@ function Arena({ match }) {
   ] });
 }
 const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAnswered, opponentAnswered, submitAnswer, userAnswer }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isBurmese = i18n.language === "my";
+  const displayText = isBurmese && currentQuestion.text_my ? currentQuestion.text_my : currentQuestion.text;
+  const displayOptions = isBurmese && currentQuestion.options_my ? currentQuestion.options_my : currentQuestion.options;
   const getDelay = (index) => `${index * 100}ms`;
   return /* @__PURE__ */ jsxs("div", { className: "flex flex-1 flex-col p-4 md:p-8 w-full max-w-4xl mx-auto", children: [
     /* @__PURE__ */ jsxs("div", { className: "relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 p-1 shadow-lg backdrop-blur-md dark:from-indigo-500/5 dark:to-purple-500/5", children: [
       /* @__PURE__ */ jsx("div", { className: "absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient-x" }),
       /* @__PURE__ */ jsxs("div", { className: "relative rounded-xl bg-white/50 p-6 text-center dark:bg-slate-900/50 md:p-10", children: [
         /* @__PURE__ */ jsx("span", { className: "mb-4 inline-block rounded-full bg-blue-100 px-4 py-1 text-xs font-bold tracking-widest text-blue-700 uppercase dark:bg-blue-900/30 dark:text-blue-300", children: currentQuestion.category }),
-        /* @__PURE__ */ jsx("h2", { className: "text-2xl font-black tracking-tight text-slate-800 md:text-4xl md:leading-snug dark:text-slate-100", children: currentQuestion.text })
+        /* @__PURE__ */ jsx("h2", { className: "text-2xl font-black tracking-tight text-slate-800 md:text-4xl md:leading-snug dark:text-slate-100", children: displayText })
       ] })
     ] }),
-    /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6", children: currentQuestion.options.map((opt, idx) => {
+    /* @__PURE__ */ jsx("div", { className: "grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6", children: displayOptions.map((opt, idx) => {
       const isSelected = userAnswer === opt;
       const isCorrect = lastRoundResult?.correct_option === opt;
       const showResult = status === "ROUND_RESULT";
@@ -410,7 +413,7 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
       return /* @__PURE__ */ jsxs(
         "button",
         {
-          onClick: () => submitAnswer(opt),
+          onClick: () => submitAnswer(currentQuestion.options[idx]),
           disabled: hasAnswered || showResult,
           className: `group relative flex items-center gap-4 overflow-hidden rounded-2xl border-2 p-5 text-left transition-all duration-300 shadow-sm ${buttonStyle}`,
           style: { animationDelay: getDelay(idx) },

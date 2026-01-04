@@ -14,6 +14,8 @@ class Question extends Model
         'difficulty',
         'question_text',
         'options',
+        'question_text_my',
+        'options_my',
         'correct_answer',
         'ai_generated',
         'language',
@@ -21,6 +23,7 @@ class Question extends Model
 
     protected $casts = [
         'options' => 'array',
+        'options_my' => 'array',
         'ai_generated' => 'boolean',
     ];
 }

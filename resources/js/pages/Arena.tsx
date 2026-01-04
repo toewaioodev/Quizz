@@ -180,7 +180,11 @@ function Arena({ match }: { match: any }) {
 }
 
 const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAnswered, opponentAnswered, submitAnswer, userAnswer }: any) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isBurmese = i18n.language === 'my';
+
+    const displayText = (isBurmese && currentQuestion.text_my) ? currentQuestion.text_my : currentQuestion.text;
+    const displayOptions = (isBurmese && currentQuestion.options_my) ? currentQuestion.options_my : currentQuestion.options;
 
     // Animation delay for staggered reveal
     const getDelay = (index: number) => `${index * 100}ms`;
@@ -195,14 +199,14 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
                         {currentQuestion.category}
                     </span>
                     <h2 className="text-2xl font-black tracking-tight text-slate-800 md:text-4xl md:leading-snug dark:text-slate-100">
-                        {currentQuestion.text}
+                        {displayText}
                     </h2>
                 </div>
             </div>
 
             {/* Options Grid */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-                {currentQuestion.options.map((opt: string, idx: number) => {
+                {displayOptions.map((opt: string, idx: number) => {
                     const isSelected = userAnswer === opt;
                     const isCorrect = lastRoundResult?.correct_option === opt;
                     const showResult = status === 'ROUND_RESULT';
@@ -233,7 +237,7 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
                     return (
                         <button
                             key={idx}
-                            onClick={() => submitAnswer(opt)}
+                            onClick={() => submitAnswer(currentQuestion.options[idx])}
                             disabled={hasAnswered || showResult}
                             className={`group relative flex items-center gap-4 overflow-hidden rounded-2xl border-2 p-5 text-left transition-all duration-300 shadow-sm ${buttonStyle}`}
                             style={{ animationDelay: getDelay(idx) }}

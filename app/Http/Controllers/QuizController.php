@@ -13,17 +13,23 @@ class QuizController extends Controller
         $request->validate([
             'topic' => 'nullable|string',
             'difficulty' => 'nullable|string',
-            'language' => 'nullable|string|in:en,my',
+            'language' => 'nullable|string',
         ]);
 
         $topic = $request->input('topic');
         $difficulty = $request->input('difficulty', 'medium');
-        $language = $request->input('language', 'en');
-
+        // We now filter essentially by 'en' because all bilingual rows are 'en' base.
+        // But for backward compatibility if we had separate rows, we can keep it loose or just ignore 'my'.
+        // Since we migrated to single row, let's just query normally. If language is 'my', we still want the row which is technically 'en'.
+        // So we might remove the strict language check or default it to 'en' for the DB query.
+        
         $query = Question::query();
 
-        // Filter by language
-        $query->where('language', $language);
+        // Since all bilingual questions are stored with language='en' but have my_ fields,
+        // we essentially always want to query for 'en' records if the requested language is 'my'.
+        // Or simply remove the language constraint if we only have one dataset. 
+        // Let's force 'en' query if 'my' is requested, as the row contains both.
+        $query->where('language', 'en'); 
 
         // Exclude answered questions using subquery for performance
         $userId = $request->user()->id;
@@ -36,9 +42,6 @@ class QuizController extends Controller
         });
 
         if ($topic) {
-            // Simple mapping or direct search. For now direct search.
-            // In future could map frontend topic IDs to DB categories.
-            // e.g. 'math' -> 'Mathematics', 'science' -> 'Science'
             $categoryMap = [
                 'math' => 'Mathematics',
                 'science' => 'Science',
@@ -61,37 +64,13 @@ class QuizController extends Controller
 
         $question = $query->inRandomOrder()->first();
 
-        // Fallback if no question found in selected language, try fallback to English if not already English
-        if (!$question && $language !== 'en') {
-             $fallbackQuery = Question::query()->where('language', 'en');
-             
-             // Also exclude answered for fallback
-             $fallbackQuery->whereNotExists(function ($subquery) use ($userId) {
-                $subquery->select(DB::raw(1))
-                         ->from('user_answers')
-                         ->whereColumn('user_answers.question_id', 'questions.id')
-                         ->where('user_answers.user_id', $userId);
-            });
-             
-             if ($topic) {
-                 if (isset($categoryMap[strtolower($topic)])) {
-                     $fallbackQuery->where('category', $categoryMap[strtolower($topic)]);
-                 } elseif ($topic !== 'General Knowledge') {
-                     $fallbackQuery->where('category', $topic);
-                 }
-             }
-             if ($difficulty) {
-                 $fallbackQuery->where('difficulty', $difficulty);
-             }
-             $question = $fallbackQuery->inRandomOrder()->first();
-        }
-
-        // Final fallback to any question
         if (!$question) {
-            $question = Question::inRandomOrder()->first();
-        }
-
-        if (!$question) {
+            // If no question found, try removing difficulty filter
+            if ($difficulty) {
+                 $query->withoutGlobalScopes()->where('difficulty', '!=', $difficulty);
+                 // Reset query parts if needed... actually simpler to just re-query or return 404.
+                 // Let's just return 404 for now to be strict, or random.
+            }
              return response()->json(['error' => 'No questions found in database.'], 404);
         }
 

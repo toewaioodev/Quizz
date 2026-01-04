@@ -9,6 +9,8 @@ interface Question {
     question_id: number;
     text: string;
     options: string[];
+    text_my?: string;
+    options_my?: string[];
     category: string;
     round_index: number;
     total_rounds: number;

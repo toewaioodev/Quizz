@@ -77,6 +77,8 @@ class GameStateService
             'question_id' => $question->id,
             'text' => $question->question_text,
             'options' => $question->options, // assumed JSON/array
+            'text_my' => $question->question_text_my,
+            'options_my' => $question->options_my,
             'category' => $question->category,
             'round_index' => $index + 1,
             'total_rounds' => 5,
@@ -183,6 +185,8 @@ class GameStateService
                     'question_id' => $q->id,
                     'text' => $q->question_text,
                     'options' => $q->options,
+                    'text_my' => $q->question_text_my,
+                    'options_my' => $q->options_my,
                     'category' => $q->category,
                     'round_index' => $match->current_question_index + 1,
                     'total_rounds' => 5,

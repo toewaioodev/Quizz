@@ -62,9 +62,11 @@ function CategoryQuiz({ categoryId, categoryName }) {
       console.error(e);
     }
   };
+  const displayQuestionText = i18n.language === "my" && currentQuestion?.question_text_my ? currentQuestion.question_text_my : currentQuestion?.question_text;
+  const displayOptions = i18n.language === "my" && currentQuestion?.options_my ? currentQuestion.options_my : currentQuestion?.options;
   return /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-gray-100", children: [
     /* @__PURE__ */ jsx(Head, { title: `${categoryName} Quiz` }),
-    /* @__PURE__ */ jsx("header", { className: "fixed top-0 left-0 right-0 z-50 border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto flex max-w-4xl items-center justify-between", children: [
+    /* @__PURE__ */ jsx("header", { className: "fixed top-0 right-0 left-0 z-50 border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80", children: /* @__PURE__ */ jsxs("div", { className: "mx-auto flex max-w-4xl items-center justify-between", children: [
       /* @__PURE__ */ jsxs(
         Link,
         {
@@ -78,17 +80,17 @@ function CategoryQuiz({ categoryId, categoryName }) {
       ),
       /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-4", children: [
         /* @__PURE__ */ jsxs("div", { className: "hidden sm:block", children: [
-          /* @__PURE__ */ jsx("span", { className: "text-xs font-bold text-slate-400 uppercase tracking-wider", children: t("Category") }),
+          /* @__PURE__ */ jsx("span", { className: "text-xs font-bold tracking-wider text-slate-400 uppercase", children: t("Category") }),
           /* @__PURE__ */ jsx("div", { className: "font-bold", children: t(categoryName) })
         ] }),
-        /* @__PURE__ */ jsx("div", { className: "h-8 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block" }),
+        /* @__PURE__ */ jsx("div", { className: "hidden h-8 w-px bg-slate-200 sm:block dark:bg-slate-700" }),
         /* @__PURE__ */ jsxs("div", { className: "text-right", children: [
-          /* @__PURE__ */ jsx("span", { className: "text-xs font-bold text-slate-400 uppercase tracking-wider", children: t("Score") }),
+          /* @__PURE__ */ jsx("span", { className: "text-xs font-bold tracking-wider text-slate-400 uppercase", children: t("SCORE") }),
           /* @__PURE__ */ jsx("div", { className: "text-xl font-black text-blue-600 dark:text-blue-400", children: points })
         ] })
       ] })
     ] }) }),
-    /* @__PURE__ */ jsx("div", { className: "fixed top-[61px] left-0 right-0 z-40 h-1 bg-slate-200 dark:bg-slate-800", children: /* @__PURE__ */ jsx(
+    /* @__PURE__ */ jsx("div", { className: "fixed top-[61px] right-0 left-0 z-40 h-1 bg-slate-200 dark:bg-slate-800", children: /* @__PURE__ */ jsx(
       motion.div,
       {
         initial: { width: 0 },
@@ -105,7 +107,7 @@ function CategoryQuiz({ categoryId, categoryName }) {
         className: "flex flex-col items-center justify-center py-20",
         children: [
           /* @__PURE__ */ jsx("div", { className: "h-16 w-16 animate-spin rounded-full border-4 border-slate-200 border-t-blue-500" }),
-          /* @__PURE__ */ jsx("p", { className: "mt-4 font-medium text-slate-500", children: t("Loading Question...") })
+          /* @__PURE__ */ jsx("p", { className: "mt-4 font-medium text-slate-500", children: t("Loading questions...") })
         ]
       },
       "loader"
@@ -126,13 +128,14 @@ function CategoryQuiz({ categoryId, categoryName }) {
               t("Streak!")
             ] })
           ] }) }),
-          /* @__PURE__ */ jsx("div", { className: "relative overflow-hidden rounded-3xl bg-white p-8 shadow-2xl dark:bg-slate-800/50 dark:ring-1 dark:ring-white/10", children: /* @__PURE__ */ jsx("h2", { className: "text-center text-2xl font-black leading-tight text-slate-800 md:text-3xl dark:text-white", children: currentQuestion.question_text }) }),
-          /* @__PURE__ */ jsx("div", { className: "grid gap-4 sm:grid-cols-2", children: currentQuestion.options.map((opt, idx) => {
+          /* @__PURE__ */ jsx("div", { className: "relative overflow-hidden rounded-3xl bg-white p-8 shadow-2xl dark:bg-slate-800/50 dark:ring-1 dark:ring-white/10", children: /* @__PURE__ */ jsx("h2", { className: "text-center text-2xl leading-tight font-black text-slate-800 md:text-3xl dark:text-white", children: displayQuestionText }) }),
+          /* @__PURE__ */ jsx("div", { className: "grid gap-4 sm:grid-cols-2", children: displayOptions?.map((opt, idx) => {
+            const originalOption = currentQuestion.options[idx];
             let btnClass = "group relative overflow-hidden rounded-2xl border-2 p-5 text-left transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/20 ";
             if (result) {
-              if (opt === result.correct_answer) {
+              if (originalOption === result.correct_answer) {
                 btnClass += "border-green-500 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300 z-10 scale-[1.02] shadow-green-500/20";
-              } else if (opt === result.selected_option && !result.correct) {
+              } else if (originalOption === result.selected_option && !result.correct) {
                 btnClass += "border-red-500 bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300 opacity-80";
               } else {
                 btnClass += "border-slate-200 bg-slate-50 opacity-40 dark:border-slate-700 dark:bg-slate-800/50";
@@ -143,11 +146,17 @@ function CategoryQuiz({ categoryId, categoryName }) {
             return /* @__PURE__ */ jsx(
               "button",
               {
-                onClick: () => !result && submitAnswer(opt),
+                onClick: () => !result && submitAnswer(originalOption),
                 disabled: !!result,
                 className: btnClass,
                 children: /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
-                  /* @__PURE__ */ jsx("div", { className: `flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm font-bold transition-colors ${result && (opt === result.correct_answer || opt === result.selected_option && !result.correct) ? "border-transparent bg-white/20" : "border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400"}`, children: String.fromCharCode(65 + idx) }),
+                  /* @__PURE__ */ jsx(
+                    "div",
+                    {
+                      className: `flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border text-sm font-bold transition-colors ${result && (originalOption === result.correct_answer || originalOption === result.selected_option && !result.correct) ? "border-transparent bg-white/20" : "border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-400"}`,
+                      children: String.fromCharCode(65 + idx)
+                    }
+                  ),
                   /* @__PURE__ */ jsx("span", { className: "font-bold", children: opt })
                 ] })
               },
@@ -159,10 +168,16 @@ function CategoryQuiz({ categoryId, categoryName }) {
             {
               initial: { opacity: 0, y: 20 },
               animate: { opacity: 1, y: 0 },
-              className: "fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:border-slate-800 dark:bg-slate-900",
+              className: "fixed right-0 bottom-0 left-0 z-50 border-t border-slate-200 bg-white p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:border-slate-800 dark:bg-slate-900",
               children: /* @__PURE__ */ jsxs("div", { className: "mx-auto flex max-w-4xl items-center justify-between", children: [
                 /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-4", children: [
-                  /* @__PURE__ */ jsx("div", { className: `flex h-12 w-12 items-center justify-center rounded-full text-2xl ${result.correct ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`, children: result.correct ? "✓" : "✗" }),
+                  /* @__PURE__ */ jsx(
+                    "div",
+                    {
+                      className: `flex h-12 w-12 items-center justify-center rounded-full text-2xl ${result.correct ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`,
+                      children: result.correct ? "✓" : "✗"
+                    }
+                  ),
                   /* @__PURE__ */ jsxs("div", { children: [
                     /* @__PURE__ */ jsx("div", { className: `font-black uppercase ${result.correct ? "text-green-600" : "text-red-500"}`, children: result.correct ? t("Correct!") : t("Wrong Answer") }),
                     /* @__PURE__ */ jsx("div", { className: "text-sm font-medium text-slate-500 dark:text-slate-400", children: result.correct ? `+${result.points_earned} PTS` : t("Don't give up!") })
@@ -175,7 +190,15 @@ function CategoryQuiz({ categoryId, categoryName }) {
                     className: "flex items-center gap-2 rounded-xl bg-slate-900 px-6 py-3 font-bold text-white shadow-lg transition-transform hover:scale-105 active:scale-95 dark:bg-white dark:text-slate-900",
                     children: [
                       t("Next Question"),
-                      /* @__PURE__ */ jsx("svg", { className: "h-5 w-5", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M14 5l7 7m0 0l-7 7m7-7H3" }) })
+                      /* @__PURE__ */ jsx("svg", { className: "h-5 w-5", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: /* @__PURE__ */ jsx(
+                        "path",
+                        {
+                          strokeLinecap: "round",
+                          strokeLinejoin: "round",
+                          strokeWidth: 2,
+                          d: "M14 5l7 7m0 0l-7 7m7-7H3"
+                        }
+                      ) })
                     ]
                   }
                 )

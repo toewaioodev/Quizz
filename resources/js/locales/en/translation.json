@@ -166,5 +166,9 @@
         "back_to_dashboard": "Back to Dashboard"
     },
     "OFFLINE": "OFFLINE",
-    "ONLINE": "ONLINE"
+    "ONLINE": "ONLINE",
+    "Exit": "Exit",
+    "SCORE": "SCORE",
+    "Loading questions...": "Loading questions...",
+    "Streak!": "Streak!"
 }

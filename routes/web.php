@@ -12,6 +12,7 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AblyController;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
@@ -57,6 +58,9 @@ Route::middleware(['auth'])->group(function () {
     // Leaderboard
     // Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
+
+    // Ably Auth
+    Route::get('/ably/auth', [AblyController::class, 'auth'])->name('ably.auth');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

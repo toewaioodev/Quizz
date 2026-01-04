@@ -4,15 +4,14 @@ import * as Ably from 'ably';
 import { AblyProvider } from 'ably/react';
 import { useMemo } from 'react';
 import InvitationManager from './InvitationManager';
-import OnlineUsersWidget from './OnlineUsersWidget';
 
 export default function GlobalAblyProvider({ children }: { children: React.ReactNode }) {
-    const { auth, ably_key } = usePage<SharedData>().props;
+    const { auth } = usePage<SharedData>().props;
 
     const client = useMemo(() => {
-        if (!auth.user || !ably_key) return null;
-        return new Ably.Realtime({ key: ably_key, clientId: String(auth.user.id) });
-    }, [auth.user?.id, ably_key]);
+        if (!auth.user) return null;
+        return new Ably.Realtime({ authUrl: '/ably/auth', authMethod: 'GET' });
+    }, [auth.user?.id]);
 
     if (!client) {
         return <>{children}</>;
@@ -21,7 +20,6 @@ export default function GlobalAblyProvider({ children }: { children: React.React
     return (
         <AblyProvider client={client}>
             <InvitationManager />
-            {/* <OnlineUsersWidget /> */}
             {children}
         </AblyProvider>
     );

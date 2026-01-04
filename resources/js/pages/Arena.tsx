@@ -314,10 +314,10 @@ const GameOverDisplay = memo(({ score, opponentScore, isWinner, isDraw }: any) =
             </div>
 
             <button
-                onClick={() => (window.location.href = '/dashboard')}
+                onClick={() => (window.location.href = '/lobby')}
                 className="rounded-2xl bg-slate-900 px-8 py-4 font-bold text-white shadow-xl hover:scale-105 dark:bg-white dark:text-slate-900"
             >
-                {t('Back to Dashboard')}
+                {t('Back to Lobby')}
             </button>
         </div>
     );

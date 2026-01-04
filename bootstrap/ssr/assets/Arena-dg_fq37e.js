@@ -465,9 +465,9 @@ const GameOverDisplay = memo(({ score, opponentScore, isWinner, isDraw }) => {
     /* @__PURE__ */ jsx(
       "button",
       {
-        onClick: () => window.location.href = "/dashboard",
+        onClick: () => window.location.href = "/lobby",
         className: "rounded-2xl bg-slate-900 px-8 py-4 font-bold text-white shadow-xl hover:scale-105 dark:bg-white dark:text-slate-900",
-        children: t("Back to Dashboard")
+        children: t("Back to Lobby")
       }
     )
   ] });

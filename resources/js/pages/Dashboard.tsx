@@ -1,13 +1,12 @@
+import { BottomNav } from '@/components/ui/BottomNav';
 import { Head, Link, usePage } from '@inertiajs/react';
-import axios from 'axios';
-import React from 'react';
 import { useTranslation } from 'react-i18next'; // Assuming I want to translate things here too eventually, but for now just Navbar.
-import Navbar from '../Components/Navbar';
+import Navbar from '../components/Navbar';
 import { SharedData } from '../types';
 
 // ... imports
 
-export default function Dashboard({ categoryCounts }: { categoryCounts: Record<string, number> }) {
+export default function Dashboard({ categoryCounts, rank }: { categoryCounts: Record<string, number>; rank: number }) {
     const { t } = useTranslation();
     const user = usePage<SharedData>().props.auth.user;
 
@@ -69,9 +68,114 @@ export default function Dashboard({ categoryCounts }: { categoryCounts: Record<s
             {/* Header */}
             <Navbar />
 
-            <main className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
+            <main className="mx-auto max-w-7xl  px-4 py-10 sm:px-6 lg:px-8">
                 {/* Hero / Stats Section */}
+                {/* Background decoration */}
+
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div className="group relative flex min-h-[300px] flex-col justify-between overflow-hidden rounded-3xl border border-white/10 shadow-2xl transition-all hover:scale-[1.02] hover:shadow-indigo-500/20 dark:border-white/5">
+                        {/* Background & Glass Effect */}
+                        <div className="absolute inset-0 bg-slate-900">
+                            {/* Animated Gradients */}
+                            <div className="absolute -top-[50%] -right-[50%] h-[500px] w-[500px] rounded-full bg-indigo-500/30 blur-[100px] transition-all duration-1000 group-hover:bg-indigo-500/40" />
+                            <div className="absolute -bottom-[50%] -left-[50%] h-[500px] w-[500px] rounded-full bg-blue-500/20 blur-[100px] transition-all duration-1000 group-hover:bg-blue-500/30" />
+                        </div>
+
+                        {/* Glass Overlay */}
+                        <div className="absolute inset-0 bg-white/5 backdrop-blur-sm" />
+
+                        <div className="relative z-10 flex h-full flex-col p-6 sm:p-8">
+
+                            {/* Header: User Info & Rank */}
+                            <div className="flex items-start justify-between">
+                                <Link href="/profile" className="flex items-center gap-4 transition-opacity hover:opacity-80">
+                                    <div className="relative">
+                                        <div className="h-16 w-16 overflow-hidden rounded-full ring-4 ring-white/10 sm:h-20 sm:w-20">
+                                            <img
+                                                src={user.profile_photo_url}
+                                                alt={user.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-lg ring-4 ring-slate-900">
+                                            ✨
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-black tracking-tight text-white sm:text-3xl">{user.name}</h3>
+                                        <p className="text-sm font-medium text-indigo-300 sm:text-base">Level {Math.floor(user.points / 100) + 1} Challenger</p>
+                                    </div>
+                                </Link>
+
+                                <div className="text-right">
+                                    <div className="text-xs font-bold tracking-wider text-indigo-200 uppercase sm:text-sm">{t('Global Rank')}</div>
+                                    <div className="text-3xl font-black text-white sm:text-5xl">#{rank}</div>
+                                </div>
+                            </div>
+
+                            {/* Main Stat: Points */}
+                            <div className="mt-8 mb-6">
+                                <div className="flex items-baseline gap-2">
+                                    <span className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-5xl font-black tracking-tighter text-transparent sm:text-7xl">
+                                        {user.points.toLocaleString()}
+                                    </span>
+                                    <span className="text-lg font-bold text-indigo-300 sm:text-2xl">PTS</span>
+                                </div>
+                                {/* Progress Bar to next level (mock calculation) */}
+                                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-white/10">
+                                    <div
+                                        className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-blue-400 shadow-[0_0_15px_rgba(99,102,241,0.6)]"
+                                        style={{ width: `${(user.points % 100)}%` }}
+                                    />
+                                </div>
+                                <div className="mt-1 text-right text-xs font-medium text-slate-400">
+                                    {100 - (user.points % 100)} PTS to Level {Math.floor(user.points / 100) + 2}
+                                </div>
+                            </div>
+
+                            {/* Footer Stats Grid */}
+                            <div className="mt-auto grid grid-cols-2 gap-4">
+                                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-colors hover:bg-white/10">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/20 text-green-400">
+                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div className="text-2xl font-bold text-white">{user.wins}</div>
+                                            <div className="text-xs font-bold tracking-wide text-slate-400 uppercase">{t('Victories')}</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-colors hover:bg-white/10">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
+                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div className="text-2xl font-bold text-white">
+                                                {Math.round((user.wins / (user.wins + user.losses || 1)) * 100)}%
+                                            </div>
+                                            <div className="text-xs font-bold tracking-wide text-slate-400 uppercase">{t('Win Rate')}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Background Image */}
+                        <div className="absolute inset-0">
+                            <img
+                                src="/images/rating_bg.jpg"
+                                alt="Battle Arena"
+                                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-transparent"></div>
+                        </div>
+                    </div>
                     <div className="group relative col-span-1 flex min-h-[300px] flex-col justify-center overflow-hidden rounded-3xl shadow-2xl md:col-span-2">
                         {/* Background Image */}
                         <div className="absolute inset-0">
@@ -98,70 +202,16 @@ export default function Dashboard({ categoryCounts }: { categoryCounts: Record<s
                         </div>
                     </div>
 
-                    <div className="group relative flex min-h-[300px] flex-col justify-center overflow-hidden rounded-3xl border border-slate-200/50 shadow-xl dark:border-slate-700/50">
-                        {/* Background Image */}
-                        <div className="absolute inset-0">
-                            <img
-                                src="/images/rating_bg.jpg"
-                                alt="Rating Background"
-                                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-900/80 to-slate-900/40"></div>
-                        </div>
 
-                        <div className="relative z-10 p-6">
-                            <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-2">
-                                <h3 className="text-sm font-bold tracking-wider text-blue-200 uppercase">{t('Your Rating')}</h3>
-
-                                <div className="flex flex-col items-center space-x-2 text-center">
-                                    <img
-                                        src={user.profile_photo_url}
-                                        alt={user.name}
-                                        className="h-10 w-10 rounded-full object-cover ring-2 ring-white/20"
-                                    />
-                                    <span className="mt-1 block text-sm font-medium text-white">{user.name}</span>
-                                </div>
-                            </div>
-
-                            <div className="mb-4 flex items-end space-x-3">
-                                <span className="bg-gradient-to-r from-yellow-300 to-amber-500 bg-clip-text text-6xl font-black text-transparent drop-shadow-sm filter">
-                                    {user.points || 0}
-                                </span>
-                                <span className="mb-3 flex items-center text-sm font-bold text-yellow-400">{t('PTS')}</span>
-                            </div>
-
-                            <div className="mb-2 flex items-center justify-between text-xs font-semibold text-slate-300">
-                                <span>{t('Win Rate')}</span>
-                                <span>{Math.round((user.wins / (user.wins + user.losses || 1)) * 100)}%</span>
-                            </div>
-                            <div className="mb-6 h-3 w-full overflow-hidden rounded-full bg-slate-700/50 ring-1 ring-white/10 backdrop-blur-sm">
-                                <div
-                                    className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-                                    style={{ width: `${(user.wins / (user.wins + user.losses || 1)) * 100}%` }}
-                                ></div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="rounded-xl border border-white/5 bg-white/5 p-3 text-center backdrop-blur-sm">
-                                    <div className="mb-1 text-xl font-black text-green-400">{user.wins || 0}</div>
-                                    <div className="text-xs tracking-wide text-slate-400 uppercase">{t('Wins')}</div>
-                                </div>
-                                <div className="rounded-xl border border-white/5 bg-white/5 p-3 text-center backdrop-blur-sm">
-                                    <div className="mb-1 text-xl font-black text-red-400">{user.losses || 0}</div>
-                                    <div className="text-xs tracking-wide text-slate-400 uppercase">{t('Losses')}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Categories */}
                 <div>
-                    <h2 className="mb-6 flex items-center text-2xl font-bold">
+                    <h2 className="mb-6 mt-6 flex items-center text-2xl font-bold">
                         <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{t('Explore Categories')}</span>
                     </h2>
 
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {categories.map((cat) => (
                             <Link
                                 key={cat.id}
@@ -209,6 +259,7 @@ export default function Dashboard({ categoryCounts }: { categoryCounts: Record<s
                         ))}
                     </div>
                 </div>
+                {/* <BottomNav /> */}
             </main>
         </div>
     );

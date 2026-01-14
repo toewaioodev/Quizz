@@ -1,5 +1,5 @@
-import ArenaHeader from '@/Components/ArenaHeader';
-import ThemeSwitcher from '@/Components/ThemeSwitcher';
+import ArenaHeader from '@/components/ArenaHeader';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { Head, usePage } from '@inertiajs/react';
 import { ChannelProvider, useChannel, usePresence, usePresenceListener } from 'ably/react';
@@ -81,71 +81,72 @@ function Arena({ match }: { match: any }) {
     const isDraw = state.status === 'GAME_OVER' && !state.winnerId;
 
     return (
-        <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-slate-50 font-sans text-slate-900 transition-colors duration-300 selection:bg-blue-500 selection:text-white dark:bg-slate-950 dark:text-white">
+        <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-slate-950 font-sans text-white selection:bg-indigo-500 selection:text-white">
             <Head title="Arena" />
 
-            <div className="absolute top-4 right-4 z-50 hidden md:block">
-                <ThemeSwitcher />
-            </div>
-
-            {/* Ambient Background */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] animate-pulse rounded-full bg-blue-500/20 blur-[100px]" />
-                <div className="absolute right-[-10%] bottom-[-10%] h-[500px] w-[500px] animate-pulse rounded-full bg-purple-500/20 blur-[100px] delay-700" />
+            {/* Ambient Background - Dynamic & Dark */}
+            <div className="pointer-events-none absolute inset-0">
+                <div className="absolute -left-[20%] -top-[20%] h-[800px] w-[800px] animate-pulse rounded-full bg-indigo-600/20 blur-[120px]" />
+                <div className="absolute -bottom-[20%] -right-[20%] h-[800px] w-[800px] animate-pulse rounded-full bg-blue-600/20 blur-[120px] delay-1000" />
+                <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
             </div>
 
             {/* Header / StatusBar */}
-            <ArenaHeader
-                user={user}
-                opponent={opponent}
-                score={score}
-                opponentScore={opponentScore}
-                timer={timer}
-                currentQuestionIndex={currentQuestion?.round_index}
-                status={state.status}
-                opponentPresent={opponentPresent}
-            />
+            <div className="z-10 mt-safe pt-4 w-full flex justify-center">
+                <ArenaHeader
+                    user={user}
+                    opponent={opponent}
+                    score={score}
+                    opponentScore={opponentScore}
+                    timer={timer}
+                    currentQuestionIndex={currentQuestion?.round_index}
+                    status={state.status}
+                    opponentPresent={opponentPresent}
+                />
+            </div>
 
             {/* Main Game Area */}
-            <div className="z-10 flex w-full max-w-4xl flex-1 flex-col justify-center p-2 md:p-4">
-                <div className="relative flex min-h-[400px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white/80 shadow-2xl backdrop-blur-xl transition-all duration-500 md:min-h-[500px] dark:border-white/10 dark:bg-slate-900/60">
-                    {/* Waiting State */}
-                    {state.status === 'WAITING_FOR_OPPONENT' && (
-                        <div className="animate-in fade-in md:p6 flex flex-1 flex-col items-center justify-center space-y-8 p-4 text-center duration-700 md:p-6">
-                            <div className="relative">
-                                <div className="h-24 w-24 rounded-full border-4 border-slate-200 dark:border-slate-800" />
-                                <div className="absolute inset-0 h-24 w-24 animate-spin rounded-full border-t-4 border-blue-500" />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <svg className="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-bold md:text-3xl">{t('Searching for Opponent')}</h2>
-                                <p className="mt-2 text-slate-500 dark:text-slate-400">{t('Connecting to global matchmaking server...')}</p>
+            <div className="relative z-10 flex w-full max-w-2xl flex-1 flex-col justify-center px-4 pb-10">
+                {/* Waiting State */}
+                {state.status === 'WAITING_FOR_OPPONENT' && (
+                    <div className="flex flex-col items-center justify-center space-y-8 py-10">
+                        <div className="relative">
+                            <div className="absolute inset-0 animate-ping rounded-full bg-blue-500/20 duration-1000"></div>
+                            <div className="relative flex h-32 w-32 items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+                                <span className="text-4xl">📡</span>
                             </div>
                         </div>
-                    )}
+                        <div className="text-center">
+                            <h2 className="bg-gradient-to-br from-white to-slate-400 bg-clip-text text-3xl font-bold text-transparent">{t('Searching for Opponent')}</h2>
+                            <p className="mt-2 text-slate-400">{t('Connecting to global matchmaking server...')}</p>
+                        </div>
+                        <button onClick={() => window.history.back()} className="mt-8 rounded-full border border-white/10 px-6 py-2 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
+                            {t('Cancel')}
+                        </button>
+                    </div>
+                )}
 
-                    {/* Starting State */}
-                    {state.status === 'STARTING' && (
-                        <div className="animate-in zoom-in flex flex-1 flex-col items-center justify-center space-y-6 p-8 text-center duration-500">
-                            <div className="mb-4 text-6xl md:text-8xl">⚔️</div>
-                            <h1 className="animate-bounce bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-4xl font-black text-transparent md:text-6xl dark:from-blue-400 dark:to-purple-500">
+                {/* Starting State */}
+                {state.status === 'STARTING' && (
+                    <div className="flex flex-col items-center justify-center space-y-8 animate-in zoom-in duration-300">
+                        <div className="relative h-40 w-40">
+                            <div className="absolute inset-0 animate-ping rounded-full bg-green-500/30 duration-700"></div>
+                            <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-2xl shadow-green-500/50">
+                                <span className="text-6xl">⚔️</span>
+                            </div>
+                        </div>
+                        <div className="text-center">
+                            <h1 className="text-5xl font-black uppercase tracking-tighter text-white drop-shadow-lg">
                                 {t('MATCH FOUND!')}
                             </h1>
-                            <p className="text-xl text-slate-600 dark:text-slate-300">{t('Get Ready...')}</p>
+                            <p className="mt-4 text-xl font-medium text-emerald-400">{t('Prepare for battle...')}</p>
                         </div>
-                    )}
+                    </div>
+                )}
 
-                    {/* Question / Result State */}
-                    {(state.status === 'QUESTION_ACTIVE' || state.status === 'ROUND_RESULT') && currentQuestion && (
+                {/* Question / Result State */}
+                {(state.status === 'QUESTION_ACTIVE' || state.status === 'ROUND_RESULT') && currentQuestion && (
+                    <div className="w-full">
                         <QuestionDisplay
                             currentQuestion={currentQuestion}
                             status={state.status}
@@ -155,13 +156,14 @@ function Arena({ match }: { match: any }) {
                             submitAnswer={submitAnswer}
                             userAnswer={state.userAnswer}
                         />
-                    )}
+                    </div>
+                )}
 
-                    {/* Game Over State */}
-                    {state.status === 'GAME_OVER' && (
-                        <GameOverDisplay score={score} opponentScore={opponentScore} isWinner={isWinner} isDraw={isDraw} />
-                    )}
-                </div>
+
+                {/* Game Over State */}
+                {state.status === 'GAME_OVER' && (
+                    <GameOverDisplay user={user} opponent={opponent} score={score} opponentScore={opponentScore} isWinner={isWinner} isDraw={isDraw} />
+                )}
             </div>
         </div>
     );
@@ -183,88 +185,73 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
             if (lastRoundResult.correct_option === userAnswer) {
                 // Correct answer sound
                 const audio = new Audio('/sounds/correct.mp3');
-                audio.play().catch(() => {});
+                audio.play().catch(() => { });
             } else {
                 // Wrong answer sound
                 const audio = new Audio('/sounds/wrong.mp3');
-                audio.play().catch(() => {});
+                audio.play().catch(() => { });
             }
         }
     }, [status, lastRoundResult, hasAnswered, userAnswer]);
 
     return (
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col p-4 md:p-8">
+        <div className="flex w-full flex-col">
             {/* Question Card */}
-            <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 p-1 shadow-lg backdrop-blur-md dark:from-indigo-500/5 dark:to-purple-500/5">
-                <div className="animate-gradient-x absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
-                <div className="relative rounded-xl bg-white/50 p-6 text-center md:p-10 dark:bg-slate-900/50">
-                    <span className="mb-4 inline-block rounded-full bg-blue-100 px-4 py-1 text-xs font-bold tracking-widest text-blue-700 uppercase dark:bg-blue-900/30 dark:text-blue-300">
+            <div className="relative mb-6 overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 text-center shadow-2xl backdrop-blur-xl md:mb-10 md:p-10">
+                {/* Top Glow */}
+                <div className="absolute -top-10 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-blue-500/20 blur-[50px]"></div>
+
+                <div className="relative z-10">
+                    <span className="mb-4 inline-flex items-center rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black tracking-widest text-blue-300 uppercase shadow-[0_0_10px_rgba(59,130,246,0.2)] md:text-xs">
                         {currentQuestion.category}
                     </span>
-                    <h2 className="text-2xl font-black tracking-tight text-slate-800 md:text-4xl md:leading-snug dark:text-slate-100">
+                    <h2 className="text-xl font-black leading-tight tracking-tight text-white md:text-3xl md:leading-snug">
                         {displayText}
                     </h2>
                 </div>
             </div>
 
             {/* Options Grid */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+            <div className="grid grid-cols-1 gap-3 md:gap-4">
                 {displayOptions.map((opt: string, idx: number) => {
                     const isSelected = userAnswer === opt;
                     const isCorrect = lastRoundResult?.correct_option === opt;
                     const showResult = status === 'ROUND_RESULT';
 
-                    let buttonStyle =
-                        'border-slate-200 bg-white/80 text-slate-700 hover:border-blue-400 hover:bg-blue-50/50 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-900/20';
-                    let icon = (
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-current text-sm font-bold opacity-70 transition-all group-hover:border-transparent group-hover:bg-current group-hover:text-white">
-                            {String.fromCharCode(65 + idx)}
-                        </span>
-                    );
+                    // Base Style
+                    let buttonStyle = "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:border-white/20 hover:text-white";
+                    let icon = <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-xs font-bold">{String.fromCharCode(65 + idx)}</span>;
 
+                    // Interaction States
                     if (hasAnswered) {
-                        buttonStyle =
-                            'border-slate-200 bg-slate-50 text-slate-400 cursor-default dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-600';
+                        buttonStyle = "opacity-50 cursor-default border-transparent bg-black/20 text-slate-500";
                         if (isSelected) {
-                            buttonStyle = 'border-blue-500 bg-blue-100/50 text-blue-700 dark:border-blue-500 dark:bg-blue-900/30 dark:text-blue-300';
+                            buttonStyle = "border-blue-500/50 bg-blue-500/20 text-blue-200 opacity-100 ring-2 ring-blue-500/30";
                             icon = (
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-white">
-                                    <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        ></path>
-                                    </svg>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500 text-white shadow-lg shadow-blue-500/40">
+                                    <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                 </div>
-                            );
+                            )
                         }
                     }
 
                     if (showResult) {
                         if (isCorrect) {
-                            buttonStyle =
-                                'border-green-500 bg-green-100 text-green-800 shadow-[0_0_20px_rgba(34,197,94,0.3)] scale-[1.02] z-10 dark:border-green-500 dark:bg-green-900/30 dark:text-green-300';
+                            buttonStyle = "border-green-500 bg-green-500/20 text-white shadow-[0_0_30px_rgba(34,197,94,0.3)] scale-[1.02] z-10 ring-1 ring-green-400/50 opacity-100";
                             icon = (
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500 text-white">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                    </svg>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500 text-white shadow-lg shadow-green-500/40">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                                 </div>
-                            );
+                            )
                         } else if (isSelected) {
-                            buttonStyle =
-                                'border-red-500 bg-red-100 text-red-800 opacity-80 dark:border-red-500 dark:bg-red-900/30 dark:text-red-300';
+                            buttonStyle = "border-red-500/50 bg-red-500/20 text-red-200 ring-1 ring-red-500/30 opacity-80";
                             icon = (
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500 text-white">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500 text-white shadow-lg shadow-red-500/40">
+                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
                                 </div>
-                            );
+                            )
                         } else {
-                            buttonStyle = 'grayscale opacity-50 border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50';
+                            buttonStyle = "opacity-30 grayscale border-transparent bg-black/20";
                         }
                     }
 
@@ -273,16 +260,11 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
                             key={idx}
                             onClick={() => submitAnswer(currentQuestion.options[idx])}
                             disabled={hasAnswered || showResult}
-                            className={`group relative flex items-center gap-4 overflow-hidden rounded-2xl border-2 p-5 text-left shadow-sm transition-all duration-300 ${buttonStyle}`}
+                            className={`group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 active:scale-[0.98] md:p-5 ${buttonStyle}`}
                             style={{ animationDelay: getDelay(idx) }}
                         >
                             <div className="shrink-0">{icon}</div>
-                            <span className="text-lg font-bold tracking-tight md:text-xl">{opt}</span>
-
-                            {/* Hover Gradient Effect */}
-                            {!hasAnswered && !showResult && (
-                                <div className="absolute inset-0 translate-x-[-100%] -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:translate-x-[100%] group-hover:opacity-100"></div>
-                            )}
+                            <span className="text-base font-bold tracking-tight md:text-lg">{opt}</span>
                         </button>
                     );
                 })}
@@ -290,14 +272,17 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
 
             {/* Opponent Answered Indicator */}
             {opponentAnswered && !lastRoundResult && (
-                <div className="mt-8 flex justify-center">
-                    <div className="flex animate-pulse items-center gap-2 rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-red-600 dark:bg-red-900/30 dark:text-red-400">
-                        <span className="relative flex h-3 w-3">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                            <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
-                        </span>
-                        {t('Opponent has answered!')}
-                    </div>
+                <div className="absolute -right-4 top-1/2 -translate-y-1/2 translate-x-full px-4 md:-right-10 md:px-0">
+                    {/* On Mobile showing this might be hard, so we make it absolute or fixed toast style */}
+                </div>
+            )}
+            {opponentAnswered && !lastRoundResult && (
+                <div className="pointer-events-none fixed bottom-24 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-full border border-red-500/30 bg-red-500/10 px-6 py-2 backdrop-blur-md md:bottom-10">
+                    <span className="relative flex h-3 w-3">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
+                        <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500"></span>
+                    </span>
+                    <span className="text-sm font-bold tracking-wide text-red-200 uppercase">{t('Opponent Answered')}</span>
                 </div>
             )}
         </div>
@@ -306,7 +291,7 @@ const QuestionDisplay = memo(({ currentQuestion, status, lastRoundResult, hasAns
 
 import confetti from 'canvas-confetti';
 
-const GameOverDisplay = memo(({ score, opponentScore, isWinner, isDraw }: any) => {
+const GameOverDisplay = memo(({ user, opponent, score, opponentScore, isWinner, isDraw }: any) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -330,37 +315,81 @@ const GameOverDisplay = memo(({ score, opponentScore, isWinner, isDraw }: any) =
     }, [isWinner, isDraw]);
 
     return (
-        <div className="animate-in zoom-in flex flex-1 flex-col items-center justify-center space-y-8 p-8 text-center duration-500">
-            <h1 className="text-4xl font-black tracking-tight text-slate-900 uppercase md:text-6xl dark:text-white">{t('GAME OVER')}</h1>
-
-            <div className="flex w-full items-end justify-center gap-8 md:gap-16">
-                {/* Result Avatars similar to before */}
-                <div className="flex flex-col items-center">
-                    <div className="text-5xl font-black">{score}</div>
-                    <div className="text-sm">YOU</div>
-                </div>
-                <div className="flex flex-col items-center">
-                    <div className="text-5xl font-black">{opponentScore}</div>
-                    <div className="text-sm">OPPONENT</div>
-                </div>
-            </div>
-
-            <div className="pt-8 text-3xl font-bold">
+        <div className="flex flex-col items-center justify-center p-6 text-center animate-in zoom-in duration-500">
+            {/* Result Badge */}
+            <div className="mb-8">
                 {isWinner ? (
-                    <span className="text-green-500">VICTORY!</span>
+                    <div className="relative">
+                        <div className="absolute inset-0 animate-ping rounded-full bg-green-500/30 duration-1000"></div>
+                        <h1 className="bg-gradient-to-br from-yellow-300 to-yellow-600 bg-clip-text text-6xl font-black tracking-tighter text-transparent drop-shadow-2xl md:text-8xl">VICTORY</h1>
+                        <div className="mt-2 text-lg font-bold tracking-[0.5em] text-yellow-500 uppercase">{t('Winner!')}</div>
+                    </div>
                 ) : isDraw ? (
-                    <span className="text-yellow-500">DRAW</span>
+                    <div>
+                        <h1 className="text-6xl font-black tracking-tighter text-slate-300 md:text-8xl">DRAW</h1>
+                    </div>
                 ) : (
-                    <span className="text-red-500">DEFEAT</span>
+                    <div>
+                        <h1 className="text-6xl font-black tracking-tighter text-red-500 md:text-8xl">DEFEAT</h1>
+                        <div className="mt-2 text-lg font-bold tracking-[0.5em] text-red-400 uppercase">{t('Better luck next time')}</div>
+                    </div>
                 )}
             </div>
 
-            <button
-                onClick={() => (window.location.href = '/lobby')}
-                className="rounded-2xl bg-slate-900 px-8 py-4 font-bold text-white shadow-xl hover:scale-105 dark:bg-white dark:text-slate-900"
-            >
-                {t('Back to Lobby')}
-            </button>
+            {/* Scoreboard Card */}
+            <div className="relative mb-10 w-full max-w-lg overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+                <div className="flex items-center justify-between">
+                    {/* You */}
+                    <div className="flex flex-col items-center">
+                        <div className="relative mb-4 h-20 w-20 rounded-full border-4 border-blue-500 shadow-xl shadow-blue-500/20 md:h-24 md:w-24">
+                            {/* We don't have user object here directly but we can reuse if simplified or just show score */}
+                            <div className="h-10 w-10 overflow-hidden rounded-full ring-2 ring-blue-500/50 md:h-14 md:w-14 md:ring-4">
+                                <img
+                                    src={user.profile_photo_url || user.avatar}
+                                    alt={user.name}
+                                    className="h-full w-full object-cover"
+                                />
+                            </div>
+                        </div>
+                        <span className="text-5xl font-black text-white">{score}</span>
+                    </div>
+
+                    {/* VS */}
+                    <div className="text-2xl font-black text-slate-600 italic">VS</div>
+
+                    {/* Opponent */}
+                    <div className="flex flex-col items-center">
+                        <div className="relative mb-4 h-20 w-20 rounded-full border-4 border-purple-500 shadow-xl shadow-purple-500/20 md:h-24 md:w-24">
+                            <div className={`h-10 w-10 overflow-hidden rounded-full ring-2 transition-all md:h-14 md:w-14 md:ring-4 ${opponent ? 'ring-purple-500/50' : 'ring-slate-700'}`}>
+
+                                <img
+                                    src={opponent.profile_photo_url || opponent.avatar}
+                                    alt={opponent.name}
+                                    className="h-full w-full object-cover"
+                                />
+
+                            </div>
+                        </div>
+                        <span className="text-5xl font-black text-white">{opponentScore}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex w-full max-w-sm flex-col gap-3">
+                <button
+                    onClick={() => (window.location.href = '/lobby')}
+                    className="group relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-blue-600 px-6 py-4 font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:scale-[1.02] hover:bg-blue-500"
+                >
+                    <span className="relative z-10">{t('Back to Lobby')}</span>
+                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover:translate-x-full"></div>
+                </button>
+                <button
+                    onClick={() => (window.location.href = '/dashboard')}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-6 py-4 font-bold text-slate-300 transition-all hover:bg-white/10 hover:text-white"
+                >
+                    {t('Home')}
+                </button>
+            </div>
         </div>
     );
 });

@@ -22,10 +22,10 @@ export default function Register() {
         <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-white">
             <Head title="Register" />
 
-            <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-xl sm:p-10 dark:border-slate-800 dark:bg-slate-900">
+            <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl sm:p-10 dark:border-slate-800 dark:bg-slate-900">
                 {/* Decorative Background Elements */}
-                <div className="absolute top-0 right-0 -mt-16 -mr-16 h-48 w-48 rounded-full bg-gradient-to-br from-pink-500/20 to-orange-500/20 blur-3xl" />
-                <div className="absolute bottom-0 left-0 -mb-16 -ml-16 h-48 w-48 rounded-full bg-gradient-to-tr from-purple-500/20 to-pink-500/20 blur-3xl" />
+                <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br from-pink-500/20 to-orange-500/20 blur-3xl" />
+                <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-gradient-to-tr from-purple-500/20 to-pink-500/20 blur-3xl" />
 
                 <div className="relative z-10 mb-8 text-center">
                     <Link href="/welcome" className="mb-4 inline-block transition-transform duration-300 hover:scale-105">
@@ -45,14 +45,17 @@ export default function Register() {
                         <input
                             id="name"
                             type="text"
-                            className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 py-3.5 pr-4 pl-4 font-medium text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-pink-500"
+                            className={`w-full rounded-xl border-2 py-3.5 pl-4 pr-4 font-medium text-slate-900 placeholder-slate-400 transition-all outline-none focus:ring-4 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 ${errors.name
+                                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 dark:border-red-800'
+                                    : 'border-slate-200 focus:border-pink-500 focus:ring-pink-500/20 dark:border-slate-700 dark:focus:border-pink-500'
+                                }`}
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             required
                             autoFocus
                             placeholder="Your Username"
                         />
-                        {errors.name && <div className="mt-1.5 animate-pulse pl-1 text-xs font-bold text-red-500">{errors.name}</div>}
+                        {errors.name && <div className="mt-1.5 pl-1 text-xs font-bold text-red-500">{errors.name}</div>}
                     </div>
 
                     <div>
@@ -62,13 +65,16 @@ export default function Register() {
                         <input
                             id="email"
                             type="email"
-                            className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 py-3.5 pr-4 pl-4 font-medium text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-pink-500"
+                            className={`w-full rounded-xl border-2 py-3.5 pl-4 pr-4 font-medium text-slate-900 placeholder-slate-400 transition-all outline-none focus:ring-4 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 ${errors.email
+                                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 dark:border-red-800'
+                                    : 'border-slate-200 focus:border-pink-500 focus:ring-pink-500/20 dark:border-slate-700 dark:focus:border-pink-500'
+                                }`}
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             required
                             placeholder="name@example.com"
                         />
-                        {errors.email && <div className="mt-1.5 animate-pulse pl-1 text-xs font-bold text-red-500">{errors.email}</div>}
+                        {errors.email && <div className="mt-1.5 pl-1 text-xs font-bold text-red-500">{errors.email}</div>}
                     </div>
 
                     <div>
@@ -79,7 +85,10 @@ export default function Register() {
                             <input
                                 id="password"
                                 type={showPassword ? 'text' : 'password'}
-                                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 py-3.5 pr-12 pl-4 font-medium text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-pink-500"
+                                className={`w-full rounded-xl border-2 py-3.5 pl-4 pr-12 font-medium text-slate-900 placeholder-slate-400 transition-all outline-none focus:ring-4 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 ${errors.password
+                                        ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20 dark:border-red-800'
+                                        : 'border-slate-200 focus:border-pink-500 focus:ring-pink-500/20 dark:border-slate-700 dark:focus:border-pink-500'
+                                    }`}
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 required
@@ -88,12 +97,12 @@ export default function Register() {
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute top-1/2 right-3 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
                             >
                                 {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                             </button>
                         </div>
-                        {errors.password && <div className="mt-1.5 animate-pulse pl-1 text-xs font-bold text-red-500">{errors.password}</div>}
+                        {errors.password && <div className="mt-1.5 pl-1 text-xs font-bold text-red-500">{errors.password}</div>}
                     </div>
 
                     <div>
@@ -104,7 +113,7 @@ export default function Register() {
                             <input
                                 id="password_confirmation"
                                 type={showConfirmPassword ? 'text' : 'password'}
-                                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 py-3.5 pr-12 pl-4 font-medium text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-pink-500"
+                                className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 py-3.5 pl-4 pr-12 font-medium text-slate-900 placeholder-slate-400 transition-all outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-pink-500"
                                 value={data.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 required
@@ -113,7 +122,7 @@ export default function Register() {
                             <button
                                 type="button"
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute top-1/2 right-3 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
                             >
                                 {showConfirmPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                             </button>

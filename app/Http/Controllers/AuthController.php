@@ -74,8 +74,12 @@ class AuthController extends Controller
             ->groupBy('category')
             ->pluck('total', 'category');
 
+        $user = Auth::user();
+        $rank = \App\Models\User::where('points', '>', $user->points)->count() + 1;
+
         return Inertia::render('Dashboard', [
             'categoryCounts' => $categoryCounts,
+            'rank' => $rank,
         ]);
     }
 }

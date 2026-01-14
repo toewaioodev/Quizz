@@ -27,6 +27,11 @@ class User extends Authenticatable
         return $this->hasMany(QuizMatch::class, 'winner_id');
     }
 
+    public function matches()
+    {
+        return $this->hasMany(QuizMatch::class, 'player1_id')->orWhere('player2_id', $this->id);
+    }
+
     /**
      * The attributes that are mass assignable.
      *

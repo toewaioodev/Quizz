@@ -1,106 +1,130 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Podium } from '@/components/leaderboard/Podium';
+import { BottomNav } from '@/components/ui/BottomNav';
+import { Head, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
-import Navbar from '../../Components/Navbar';
+import Navbar from '../../components/Navbar';
 import { SharedData, User } from '../../types';
 
 export default function Leaderboard({ users }: { users: User[] }) {
     const { auth } = usePage<SharedData>().props;
     const { t } = useTranslation();
 
+    // Prepare data for Podium (Top 3)
+    const podiumPlayers = users.slice(0, 3).map((user, index) => ({
+        rank: index + 1,
+        name: user.name,
+        avatar: user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.name}`,
+        points: user.points,
+    }));
+
+    // Pad with placeholders if fewer than 3 players
+    while (podiumPlayers.length < 3) {
+        podiumPlayers.push({
+            rank: podiumPlayers.length + 1,
+            name: '---',
+            avatar: '',
+            points: 0
+        });
+    }
+
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-gray-100">
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-gray-100 pb-20">
             <Head title="Leaderboard" />
             <Navbar />
 
             {/* Background Gradients */}
-            <div className="pointer-events-none absolute top-0 left-0 h-full w-full overflow-hidden opacity-50 dark:opacity-100">
-                <div className="absolute top-[-10%] left-[20%] h-[500px] w-[500px] rounded-full bg-purple-600/20 blur-[100px]" />
-                <div className="absolute right-[10%] bottom-[-10%] h-[500px] w-[500px] rounded-full bg-blue-600/20 blur-[100px]" />
+            <div className="pointer-events-none fixed inset-0 overflow-hidden opacity-30 dark:opacity-40">
+                <div className="absolute -top-[20%] -left-[10%] h-[500px] w-[500px] rounded-full bg-purple-500/20 blur-[120px]" />
+                <div className="absolute -bottom-[20%] -right-[10%] h-[500px] w-[500px] rounded-full bg-blue-500/20 blur-[120px]" />
             </div>
 
-            <div className="z-10 mx-auto mt-10 w-full max-w-2xl space-y-8 p-6">
-                <Link
-                    href="/lobby"
-                    className="group flex items-center gap-2 text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 transition-transform group-hover:-translate-x-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    {t('Back to Lobby')}
-                </Link>
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <h1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold tracking-tighter text-transparent dark:from-blue-400 dark:to-purple-400">
-                            {t('Leaderboard')}
-                        </h1>
-                    </div>
-                    <div className="w-20" /> {/* Spacer for centering */}
+            <main className="relative z-10 mx-auto max-w-lg px-4 pt-6 sm:max-w-2xl">
+                <div className="mb-8 text-center">
+                    <h1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-black tracking-tight text-transparent dark:from-blue-400 dark:to-purple-400">
+                        {t('Leaderboard')}
+                    </h1>
+                    <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+                        {t('Top players competing for glory')}
+                    </p>
                 </div>
 
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white/50 shadow-xl backdrop-blur-xl dark:border-white/10 dark:bg-slate-900/50">
-                    <div className="grid grid-cols-12 gap-4 border-b border-slate-200 p-4 text-left text-xs font-bold tracking-wider text-slate-500 uppercase dark:border-white/5">
-                        <div className="col-span-1 text-center">#</div>
-                        <div className="col-span-5">{t('Player')}</div>
-                        <div className="col-span-2 text-center">{t('Points')}</div>
-                        <div className="col-span-2 text-center">{t('W / L')}</div>
-                        <div className="col-span-2 text-center">{t('Ratio')}</div>
+                {users.length > 0 && <Podium players={podiumPlayers} />}
+
+                <div className="mt-8 overflow-hidden rounded-3xl bg-white/80 shadow-xl backdrop-blur-xl ring-1 ring-slate-900/5 dark:bg-slate-900/80 dark:ring-white/10">
+                    <div className="grid grid-cols-12 border-b border-slate-100 bg-slate-50/50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 dark:border-white/5 dark:bg-white/5">
+                        <div className="col-span-2 text-center">#</div>
+                        <div className="col-span-6">{t('Player')}</div>
+                        <div className="col-span-4 text-right">{t('Points')}</div>
                     </div>
 
                     <div className="divide-y divide-slate-100 dark:divide-white/5">
                         {users.map((user, index) => {
                             const isMe = user.id === auth.user.id;
-                            const winRate = user.wins + user.losses > 0 ? Math.round((user.wins / (user.wins + user.losses)) * 100) : 0;
+                            const rank = index + 1;
+
+                            // Skip top 3 in list if you want, OR keep them. 
+                            // Usually showing everyone in the list is fine, or maybe start list from 4th place.
+                            // Let's keep everyone for clarity, but maybe highlight top 3 differently?
+                            // Actually, standard pattern often duplicates or starts list after podium.
+                            // Let's show all for now, as users might barely be in top 3 and want to see themselves in list context.
 
                             return (
                                 <div
                                     key={user.id}
-                                    className={`grid grid-cols-12 items-center gap-4 p-4 transition-colors ${isMe ? 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-600/10 dark:hover:bg-blue-600/20' : 'hover:bg-slate-50 dark:hover:bg-white/5'}`}
+                                    className={`group grid grid-cols-12 items-center gap-4 px-4 py-3 transition-all ${isMe
+                                            ? 'bg-blue-50/80 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20'
+                                            : 'hover:bg-slate-50 dark:hover:bg-white/5'
+                                        }`}
                                 >
-                                    <div className="col-span-1 text-center font-bold text-slate-500 dark:text-slate-400">{index + 1}</div>
-                                    <div className="col-span-5 flex items-center gap-3">
-                                        <div
-                                            className={`flex h-8 w-8 items-center justify-center overflow-hidden rounded-full text-xs font-bold ring-2 ${
-                                                index === 0
-                                                    ? 'ring-yellow-400'
-                                                    : index === 1
-                                                      ? 'ring-slate-300 dark:ring-slate-400'
-                                                      : index === 2
-                                                        ? 'ring-orange-600 dark:ring-orange-700'
-                                                        : 'ring-transparent'
-                                            }`}
-                                        >
-                                            <img
-                                                src={user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.name}`}
-                                                alt={user.name}
-                                                className="h-full w-full object-cover"
-                                            />
+                                    <div className="col-span-2 flex justify-center">
+                                        <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-black ${rank === 1 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400' :
+                                                rank === 2 ? 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300' :
+                                                    rank === 3 ? 'bg-orange-100 text-orange-800 dark:bg-orange-500/20 dark:text-orange-400' :
+                                                        'text-slate-500 dark:text-slate-500'
+                                            }`}>
+                                            {rank}
                                         </div>
-                                        <span
-                                            className={`font-medium ${isMe ? 'text-blue-600 dark:text-blue-400' : 'text-slate-800 dark:text-slate-200'}`}
-                                        >
-                                            {user.name} {isMe && '(You)'}
-                                        </span>
                                     </div>
-                                    <div className="col-span-2 text-center font-bold text-purple-600 dark:text-purple-400">{user.points}</div>
-                                    <div className="col-span-2 text-center text-sm text-slate-500 dark:text-slate-400">
-                                        <span className="text-green-600 dark:text-green-400">{user.wins}</span> -{' '}
-                                        <span className="text-red-500 dark:text-red-400">{user.losses}</span>
+
+                                    <div className="col-span-6 flex items-center gap-3 min-w-0">
+                                        <img
+                                            src={user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.name}`}
+                                            alt={user.name}
+                                            className="h-9 w-9 rounded-full object-cover ring-2 ring-white dark:ring-slate-800"
+                                        />
+                                        <div className="truncate">
+                                            <div className={`truncate text-sm font-bold ${isMe ? 'text-blue-600 dark:text-blue-400' : 'text-slate-900 dark:text-gray-200'}`}>
+                                                {user.name} {isMe && <span className="ml-1 text-xs font-normal text-slate-400">({t('You')})</span>}
+                                            </div>
+                                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                                                {user.wins} {t('Wins')}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="col-span-2 text-center text-sm font-medium text-slate-500 dark:text-slate-400">{winRate}%</div>
+
+                                    <div className="col-span-4 text-right">
+                                        <div className="font-black text-slate-900 dark:text-white">{user.points}</div>
+                                        <div className="text-xs font-medium text-slate-400">PTS</div>
+                                    </div>
                                 </div>
                             );
                         })}
                     </div>
 
-                    {users.length === 0 && <div className="p-8 text-center text-slate-500">{t('No active players yet.')}</div>}
+                    {users.length === 0 && (
+                        <div className="py-12 text-center">
+                            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800">
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">{t('No players yet')}</h3>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('Be the first to join the leaderboard!')}</p>
+                        </div>
+                    )}
                 </div>
-            </div>
+            </main>
+            <BottomNav />
         </div>
     );
 }

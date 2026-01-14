@@ -212,7 +212,7 @@ class GameController extends Controller
         
         return Inertia::render('Arena', [
             'match' => $match,
-            'ably_key' => config('services.ably.key'), 
+           
         ]);
     }
 

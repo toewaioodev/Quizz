@@ -1,4 +1,4 @@
-import Navbar from '@/Components/Navbar';
+import Navbar from '@/components/Navbar';
 import { BoltIcon, CpuChipIcon, TrophyIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import { Head, Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';

@@ -17,7 +17,7 @@ export default function Navbar() {
         <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900/80">
             <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo & Brand */}
-                <Link href="/home" className="group flex items-center space-x-3">
+                <Link href="/" className="group flex items-center space-x-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 text-xl font-bold text-white shadow-lg shadow-blue-500/20 transition-transform group-hover:scale-105">
                         Q
                     </div>

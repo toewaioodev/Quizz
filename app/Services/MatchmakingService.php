@@ -35,57 +35,80 @@ class MatchmakingService
         while ($attempts < $maxAttempts) {
             $attempts++;
             
-            // Atomic Pop from Redis Queue
-            $pendingMatchId = Redis::lpop('pending_matches');
-            Log::info("MatchmakingService: Popped Match ID: " . ($pendingMatchId ?? 'NULL'));
-            
-            if ($pendingMatchId) {
-                // Check if match exists and is valid
-                $pendingMatch = QuizMatch::find($pendingMatchId);
+            // Score-Based Matching (ELO) with Range Expansion
+            $ranges = [100, 300, 1000]; // Points difference allowed
+            $foundMatch = null;
+
+            foreach ($ranges as $range) {
+                // Ensure points are integer
+                $points = (int) ($user->points ?? 0);
+                $minScore = $points - $range;
+                $maxScore = $points + $range;
+
+                Log::info("Matchmaking: User {$user->id} ($points pts) searching range +/- $range ($minScore - $maxScore)");
                 
-                // Conditions: Exists, Pending, Not Me, Not Stale (< 60s)
-                if ($pendingMatch && 
-                    $pendingMatch->status === 'pending' && 
-                    $pendingMatch->player1_id !== $user->id &&
-                    $pendingMatch->created_at->diffInSeconds(now()) < 60
-                ) {
-                    Log::info("MatchmakingService: Found valid match {$pendingMatch->id}. Joining.");
-                    // JOIN IT
-                    $pendingMatch->update([
+                $matches = Redis::zrangebyscore('pending_matches_elo', $minScore, $maxScore, ['limit' => [0, 5]]);
+                
+                if (empty($matches)) continue;
+
+                foreach ($matches as $matchId) {
+                     // Try to remove atomically
+                     if (Redis::zrem('pending_matches_elo', $matchId) > 0) {
+                         $pendingMatch = QuizMatch::find($matchId);
+
+                         // 1. Invalid/Deleted
+                         if (!$pendingMatch || $pendingMatch->status !== 'pending') {
+                              continue;
+                         }
+                         
+                         // 2. Self-Match
+                         if ($pendingMatch->player1_id === $user->id) {
+                              $pendingMatch->delete();
+                              continue; 
+                         }
+                         
+                         // 3. Valid - Found it!
+                         $foundMatch = $pendingMatch;
+                         break 2; // Break both loops
+                     }
+                }
+            }
+
+            if ($foundMatch) {
+                $pendingMatch = $foundMatch;
+                
+                // Final Stale Check (< 300s)
+                if ($pendingMatch->created_at->diffInSeconds(now()) < 300) {
+                     // Join This Match
+                     Log::info("Matchmaking: Joining valid match {$pendingMatch->id} (P1: {$pendingMatch->player1_id})");
+                     $pendingMatch->update([
                         'player2_id' => $user->id,
-                        'status' => 'active', // Set to active immediately as we are starting
-                    ]);
+                        'status' => 'active',
+                     ]);
                     
-                    // Notify clients match is found (visual)
-                    $this->ablyService->publish(
+                     $this->ablyService->publish(
                         "match:{$pendingMatch->channel_id}", 
                         'match-found', 
                         [
                             'match_id' => $pendingMatch->id,
                             'opponent' => $user 
                         ]
-                    );
+                     );
 
-                    // Server-Authoritative Start
-                    // We call startGame immediately. 
-                    // Note: This might block the response slightly but ensures reliability.
-                    Log::info("MatchmakingService: Auto-starting Match {$pendingMatch->id}");
-                    $this->gameStateService->startGame($pendingMatch);
+                     Log::info("MatchmakingService: Auto-starting Match {$pendingMatch->id}");
+                     $this->gameStateService->startGame($pendingMatch);
                     
-                    return [
+                     return [
                         'match_id' => $pendingMatch->id, 
                         'channel_id' => $pendingMatch->channel_id, 
                         'role' => 'player2'
-                    ];
+                     ];
                 }
-                
-                // If invalid (stale, self, taken), loop again.
-                // Note: If it was 'self', we just popped our own stale match, which is fine to discard.
-            } else {
-                Log::info("MatchmakingService: Queue empty. Creating new match.");
-                // Queue is empty, Create New Match
-                return $this->createMatch($user);
             }
+            
+            // If we exhausted ranges and found nothing, create new match
+            Log::info("MatchmakingService: No match found after range expansion. Creating new.");
+            return $this->createMatch($user);
         }
         
         Log::warning("MatchmakingService: Max attempts reached.");
@@ -93,7 +116,10 @@ class MatchmakingService
         return $this->createMatch($user);
     }
 
-    protected function createMatch(User $user): array
+
+    
+
+    public function createMatch(User $user): array
     {
         Log::info("MatchmakingService: Creating new match for User {$user->id}");
         $match = QuizMatch::create([
@@ -102,9 +128,10 @@ class MatchmakingService
             'channel_id' => Str::uuid(),
         ]);
         
-        // Push to Redis Queue
-        Redis::rpush('pending_matches', $match->id);
-        Log::info("MatchmakingService: Pushed Match {$match->id} to Redis queue.");
+        // Push to Redis Sorted Set (Score = User Points)
+        $points = (int) ($user->points ?? 0);
+        Redis::zadd('pending_matches_elo', $points, $match->id);
+        Log::info("Matchmaking: Created Match {$match->id} for User {$user->id} (Points: $points) and pushed to ELO queue.");
 
         return [
             'match_id' => $match->id, 

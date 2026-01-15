@@ -1,7 +1,7 @@
 {
   "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
   "resources/js/components/ArenaHeader.tsx": [
-    "/build/assets/Arena-C4A9U4jp.js"
+    "/build/assets/Arena-CMww66Ap.js"
   ],
   "resources/js/components/DropDown.tsx": [
     "/build/assets/Navbar-DMrX0KVo.js"
@@ -22,13 +22,13 @@
     "/build/assets/Index-C4V5FIsx.js"
   ],
   "resources/js/hooks/useGameEngine.ts": [
-    "/build/assets/Arena-C4A9U4jp.js"
+    "/build/assets/Arena-CMww66Ap.js"
   ],
   "resources/js/pages/About.tsx": [
     "/build/assets/About-DFZMo354.js"
   ],
   "resources/js/pages/Arena.tsx": [
-    "/build/assets/Arena-C4A9U4jp.js"
+    "/build/assets/Arena-CMww66Ap.js"
   ],
   "resources/js/pages/Auth/Login.tsx": [
     "/build/assets/Login-CO0QzX8t.js"

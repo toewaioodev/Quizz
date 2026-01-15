@@ -113,7 +113,9 @@ const initialState = {
   opponentAnswered: false,
   hasAnswered: false,
   userAnswer: null,
-  opponent: null
+  opponent: null,
+  rematchRequested: false,
+  rematchByOpponent: false
 };
 function reducer(state, action) {
   switch (action.type) {
@@ -129,15 +131,18 @@ function reducer(state, action) {
     case "NEW_QUESTION":
       return {
         ...state,
-        status: "QUESTION_ACTIVE",
+        status: "PREPARE_ROUND",
         currentQuestion: action.payload,
         timer: action.payload.time_limit,
         hasAnswered: false,
         userAnswer: null,
-        // Reset user answer
         opponentAnswered: false,
         lastRoundResult: null
-        // Clear previous
+      };
+    case "START_QUESTION":
+      return {
+        ...state,
+        status: "QUESTION_ACTIVE"
       };
     case "TICK_TIMER":
       return { ...state, timer: Math.max(state.timer - 1, 0) };
@@ -159,6 +164,14 @@ function reducer(state, action) {
         winnerId: action.payload.winner_id,
         playerScores: action.payload.final_scores
       };
+    case "REMATCH_REQUESTED":
+      return {
+        ...state,
+        rematchByOpponent: true
+        // We will dispatch this ONLY if it matches opponent
+      };
+    case "REMATCH_READY":
+      return state;
     default:
       return state;
   }
@@ -191,6 +204,14 @@ function useGameEngine(matchId, channelId, userId, isHost) {
       case "game:over":
         dispatch({ type: "GAME_OVER", payload: message.data });
         break;
+      case "match:rematch_requested":
+        if (String(message.data.requested_by) !== String(userId)) {
+          dispatch({ type: "REMATCH_REQUESTED", payload: message.data });
+        }
+        break;
+      case "match:rematch_ready":
+        window.location.href = `/arena/${message.data.new_match_id}`;
+        break;
     }
   });
   useEffect(() => {
@@ -202,6 +223,18 @@ function useGameEngine(matchId, channelId, userId, isHost) {
     }
     return () => clearInterval(interval);
   }, [state.status, state.timer]);
+  useEffect(() => {
+    if (state.status === "PREPARE_ROUND" && state.currentQuestion?.start_at) {
+      const now = Math.floor(Date.now() / 1e3);
+      const delay = Math.max((state.currentQuestion.start_at - now) * 1e3, 0);
+      const timer = setTimeout(() => {
+        dispatch({ type: "START_QUESTION" });
+      }, delay);
+      return () => clearTimeout(timer);
+    } else if (state.status === "PREPARE_ROUND" && !state.currentQuestion?.start_at) {
+      dispatch({ type: "START_QUESTION" });
+    }
+  }, [state.status, state.currentQuestion]);
   useEffect(() => {
     const fetchState = async () => {
       try {
@@ -248,11 +281,19 @@ function useGameEngine(matchId, channelId, userId, isHost) {
       console.error(e);
     }
   };
+  const requestRematch = async () => {
+    try {
+      await axios.post(`/match/${matchId}/rematch`);
+    } catch (e) {
+      console.error(e);
+    }
+  };
   return {
     state,
     startGame,
     submitAnswer,
-    nextQuestion
+    nextQuestion,
+    requestRematch
   };
 }
 function ArenaPage({ match, ably_key }) {
@@ -339,18 +380,24 @@ function Arena({ match }) {
           /* @__PURE__ */ jsx("p", { className: "mt-4 text-xl font-medium text-emerald-400", children: t("Prepare for battle...") })
         ] })
       ] }),
-      (state.status === "QUESTION_ACTIVE" || state.status === "ROUND_RESULT") && currentQuestion && /* @__PURE__ */ jsx("div", { className: "w-full", children: /* @__PURE__ */ jsx(
-        QuestionDisplay,
-        {
-          currentQuestion,
-          status: state.status,
-          lastRoundResult: state.lastRoundResult,
-          hasAnswered: state.hasAnswered,
-          opponentAnswered: state.opponentAnswered,
-          submitAnswer,
-          userAnswer: state.userAnswer
-        }
-      ) }),
+      (state.status === "QUESTION_ACTIVE" || state.status === "ROUND_RESULT" || state.status === "PREPARE_ROUND") && currentQuestion && /* @__PURE__ */ jsxs("div", { className: "w-full", children: [
+        state.status === "PREPARE_ROUND" && /* @__PURE__ */ jsx("div", { className: "absolute inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/40 rounded-3xl", children: /* @__PURE__ */ jsxs("div", { className: "text-center animate-pulse", children: [
+          /* @__PURE__ */ jsx("h2", { className: "text-4xl font-black text-white uppercase tracking-widest drop-shadow-xl", children: t("GET READY") }),
+          /* @__PURE__ */ jsx("p", { className: "text-blue-300 font-bold mt-2", children: t("Next round starting...") })
+        ] }) }),
+        /* @__PURE__ */ jsx(
+          QuestionDisplay,
+          {
+            currentQuestion,
+            status: state.status,
+            lastRoundResult: state.lastRoundResult,
+            hasAnswered: state.hasAnswered,
+            opponentAnswered: state.opponentAnswered,
+            submitAnswer,
+            userAnswer: state.userAnswer
+          }
+        )
+      ] }),
       state.status === "GAME_OVER" && /* @__PURE__ */ jsx(GameOverDisplay, { user, opponent, score, opponentScore, isWinner, isDraw })
     ] })
   ] });
@@ -486,6 +533,15 @@ const GameOverDisplay = memo(({ user, opponent, score, opponentScore, isWinner, 
       ] })
     ] }) }),
     /* @__PURE__ */ jsxs("div", { className: "flex w-full max-w-sm flex-col gap-3", children: [
+      !isDraw && /* @__PURE__ */ jsx(
+        "button",
+        {
+          onClick: () => {
+          },
+          className: "group relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-violet-600 px-6 py-4 font-bold text-white shadow-xl shadow-violet-600/30 transition-all hover:scale-[1.02] hover:bg-violet-500",
+          children: /* @__PURE__ */ jsx("span", { className: "relative z-10", children: t("Rematch") })
+        }
+      ),
       /* @__PURE__ */ jsxs(
         "button",
         {

@@ -206,6 +206,12 @@ class GameController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
+    public function rematch(Request $request, $id)
+    {
+        $this->gameStateService->requestRematch($id, $request->user()->id);
+        return response()->json(['status' => 'requested']);
+    }
+
     public function arena($id)
     {
         $match = QuizMatch::with(['player1', 'player2'])->findOrFail($id);

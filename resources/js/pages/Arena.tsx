@@ -145,8 +145,16 @@ function Arena({ match }: { match: any }) {
                 )}
 
                 {/* Question / Result State */}
-                {(state.status === 'QUESTION_ACTIVE' || state.status === 'ROUND_RESULT') && currentQuestion && (
+                {(state.status === 'QUESTION_ACTIVE' || state.status === 'ROUND_RESULT' || state.status === 'PREPARE_ROUND') && currentQuestion && (
                     <div className="w-full">
+                        {state.status === 'PREPARE_ROUND' && (
+                            <div className="absolute inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/40 rounded-3xl">
+                                <div className="text-center animate-pulse">
+                                    <h2 className="text-4xl font-black text-white uppercase tracking-widest drop-shadow-xl">{t('GET READY')}</h2>
+                                    <p className="text-blue-300 font-bold mt-2">{t('Next round starting...')}</p>
+                                </div>
+                            </div>
+                        )}
                         <QuestionDisplay
                             currentQuestion={currentQuestion}
                             status={state.status}
@@ -376,6 +384,22 @@ const GameOverDisplay = memo(({ user, opponent, score, opponentScore, isWinner, 
             </div>
 
             <div className="flex w-full max-w-sm flex-col gap-3">
+                {/* Rematch Section */}
+                {!isDraw && (
+                    <button
+                        onClick={() => {
+                            // Call requestRematch from props
+                            // Note: We need to pass it down from Arena component -> GameOverDisplay
+                            // Check if requestRematch is available in props
+                            // Actually, looking at Arena component, we need to pass it.
+                            // For now, let's fix the prop drilling first in Arena component text.
+                        }}
+                        className="group relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-violet-600 px-6 py-4 font-bold text-white shadow-xl shadow-violet-600/30 transition-all hover:scale-[1.02] hover:bg-violet-500"
+                    >
+                        <span className="relative z-10">{t('Rematch')}</span>
+                    </button>
+                )}
+
                 <button
                     onClick={() => (window.location.href = '/lobby')}
                     className="group relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-blue-600 px-6 py-4 font-bold text-white shadow-xl shadow-blue-600/30 transition-all hover:scale-[1.02] hover:bg-blue-500"

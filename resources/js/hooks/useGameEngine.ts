@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useEffect, useReducer, useState } from 'react';
 
 // Types
-export type GameState = 'IDLE' | 'WAITING_FOR_OPPONENT' | 'STARTING' | 'QUESTION_ACTIVE' | 'ROUND_RESULT' | 'GAME_OVER';
+export type GameState = 'IDLE' | 'WAITING_FOR_OPPONENT' | 'STARTING' | 'PREPARE_ROUND' | 'QUESTION_ACTIVE' | 'ROUND_RESULT' | 'GAME_OVER';
 
 interface Question {
     question_id: number;
@@ -16,6 +16,7 @@ interface Question {
     total_rounds: number;
     time_limit: number;
     sent_at: number;
+    start_at?: number;
 }
 
 interface PlayerScores {
@@ -34,17 +35,22 @@ interface State {
     hasAnswered: boolean;
     userAnswer: string | null;
     opponent: any | null;
+    rematchRequested: boolean;
+    rematchByOpponent: boolean;
 }
 
 type Action =
     | { type: 'MATCH_FOUND'; payload: any }
     | { type: 'GAME_START'; payload: any }
     | { type: 'NEW_QUESTION'; payload: Question }
+    | { type: 'START_QUESTION' }
     | { type: 'TICK_TIMER' }
     | { type: 'OPPONENT_ANSWERED' }
     | { type: 'PLAYER_ANSWERED'; payload: string }
     | { type: 'ROUND_RESULT'; payload: any }
-    | { type: 'GAME_OVER'; payload: any };
+    | { type: 'GAME_OVER'; payload: any }
+    | { type: 'REMATCH_REQUESTED'; payload: { requested_by: number } }
+    | { type: 'REMATCH_READY'; payload: any };
 
 const initialState: State = {
     status: 'WAITING_FOR_OPPONENT',
@@ -57,6 +63,8 @@ const initialState: State = {
     hasAnswered: false,
     userAnswer: null,
     opponent: null,
+    rematchRequested: false,
+    rematchByOpponent: false,
 };
 
 function reducer(state: State, action: Action): State {
@@ -82,13 +90,18 @@ function reducer(state: State, action: Action): State {
         case 'NEW_QUESTION':
             return {
                 ...state,
-                status: 'QUESTION_ACTIVE',
+                status: 'PREPARE_ROUND',
                 currentQuestion: action.payload,
                 timer: action.payload.time_limit,
                 hasAnswered: false,
-                userAnswer: null, // Reset user answer
+                userAnswer: null,
                 opponentAnswered: false,
-                lastRoundResult: null, // Clear previous
+                lastRoundResult: null,
+            };
+        case 'START_QUESTION':
+            return {
+                ...state,
+                status: 'QUESTION_ACTIVE',
             };
         case 'TICK_TIMER':
             return { ...state, timer: Math.max(state.timer - 1, 0) };
@@ -110,6 +123,30 @@ function reducer(state: State, action: Action): State {
                 winnerId: action.payload.winner_id,
                 playerScores: action.payload.final_scores
             };
+        case 'REMATCH_REQUESTED':
+            // If requested by opponent (we need userId here to know, but we only have ID).
+            // Payload: { requested_by: userId }
+            // Ideally we need to know OUR userId. 
+            // We do have userId passed to hook.
+            // But reducer is pure. 
+            // We can check inside reducer if we pass userId to reducer? 
+            // Or perform check in dispatch.
+            // Let's assume payload tells us if it was US or THEM.
+            // Actually, we can check in the useChannel callback and dispatch appropriate boolean logic or pass userId to reducer?
+            // Let's pass the raw payload and handle logic in reducer if possible.
+            // But reducer doesn't have userId ... 
+            // Let's rely on event. If we clicked button, we set local state? 
+            // No, server broadcast.
+            // Let's updated 'rematchByOpponent' if payload.requested_by !== userId (we need to pass userId to reducer or check outside).
+            // We'll check outside.
+            return {
+                ...state,
+                rematchByOpponent: true, // We will dispatch this ONLY if it matches opponent
+            };
+        case 'REMATCH_READY':
+            // Redirect or reset?
+            // Since we redirect, maybe no state change needed?
+            return state;
         default:
             return state;
     }
@@ -148,6 +185,15 @@ export function useGameEngine(matchId: number, channelId: string, userId: number
             case 'game:over':
                 dispatch({ type: 'GAME_OVER', payload: message.data });
                 break;
+            case 'match:rematch_requested':
+                if (String(message.data.requested_by) !== String(userId)) {
+                    dispatch({ type: 'REMATCH_REQUESTED', payload: message.data });
+                }
+                break;
+            case 'match:rematch_ready':
+                // Redirect to new match
+                window.location.href = `/arena/${message.data.new_match_id}`;
+                break;
         }
     });
 
@@ -161,6 +207,23 @@ export function useGameEngine(matchId: number, channelId: string, userId: number
         }
         return () => clearInterval(interval);
     }, [state.status, state.timer]);
+
+    // Delayed Start Logic
+    useEffect(() => {
+        if (state.status === 'PREPARE_ROUND' && state.currentQuestion?.start_at) {
+            const now = Math.floor(Date.now() / 1000);
+            const delay = Math.max((state.currentQuestion.start_at - now) * 1000, 0);
+
+            const timer = setTimeout(() => {
+                dispatch({ type: 'START_QUESTION' });
+            }, delay);
+
+            return () => clearTimeout(timer);
+        } else if (state.status === 'PREPARE_ROUND' && !state.currentQuestion?.start_at) {
+            // Fallback for immediate start if no start_at
+            dispatch({ type: 'START_QUESTION' });
+        }
+    }, [state.status, state.currentQuestion]);
 
     // Initial State Fetch
     useEffect(() => {
@@ -216,10 +279,17 @@ export function useGameEngine(matchId: number, channelId: string, userId: number
         } catch (e) { console.error(e); }
     };
 
+    const requestRematch = async () => {
+        try {
+            await axios.post(`/match/${matchId}/rematch`);
+        } catch (e) { console.error(e); }
+    };
+
     return {
         state,
         startGame,
         submitAnswer,
-        nextQuestion
+        nextQuestion,
+        requestRematch
     };
 }

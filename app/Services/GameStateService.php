@@ -59,12 +59,12 @@ class GameStateService
             ]
         );
 
-        // 4. Send First Question (after small delay or immediately)
+        // 4. Send First Question (with longer delay for page load)
         Log::info("Sending first question...");
-        $this->sendQuestion($match, $questions->first(), 0);
+        $this->sendQuestion($match, $questions->first(), 0, 3);
     }
 
-    public function sendQuestion(QuizMatch $match, Question $question, int $index)
+    public function sendQuestion(QuizMatch $match, Question $question, int $index, int $delay = 3)
     {
         // Update timestamp for scoring verification and reset answers
         $match->update([
@@ -83,7 +83,8 @@ class GameStateService
             'round_index' => $index + 1,
             'total_rounds' => 5,
             'time_limit' => 15,
-            'sent_at' => now()->timestamp
+            'sent_at' => now()->timestamp,
+            'start_at' => now()->addSeconds($delay)->timestamp
         ];
 
         $this->ablyService->publish(
@@ -119,14 +120,34 @@ class GameStateService
             $points = 0;
     
             if ($isCorrect) {
-                // Server calc: Time since question sent
-                $sentAt = $match->last_question_at;
-                $now = now();
-                // Diff in seconds (float)
-                $diffInSeconds = $sentAt ? $now->diffInSeconds($sentAt) : 15;
-                
-                $timeTaken = abs($diffInSeconds); 
-                $timeRemaining = max(15 - $timeTaken, 0);
+                 // Server calc: Time since question sent
+                 $sentAt = $match->last_question_at;
+                 $now = now();
+                 
+                 // Determine start time based on rounds
+                 // Logic must match sendQuestion delays
+                 // Round 1 = 6s, Others = 3s
+                 $delay = ($match->current_question_index == 0) ? 6 : 3;
+                 
+                 $startAt = $sentAt ? $sentAt->copy()->addSeconds($delay) : now();
+                 
+                 // If answered BEFORE startAt (impossible via UI but possible via API), points might be weird?
+                 // Let's assume answered after startAt.
+                 
+                 $diffInSeconds = $now->diffInSeconds($startAt);
+                 
+                 // If before start, invalid? Or just max points?
+                 // Let's rely on diff. If now > startAt, positive.
+                 // Actually diffInSeconds is absolute.
+                 
+                 if ($now->lessThan($startAt)) {
+                     // Answered too early (cheat?)
+                     $timeTaken = 0;
+                 } else {
+                     $timeTaken = $startAt->diffInSeconds($now);
+                 }
+
+                 $timeRemaining = max(15 - $timeTaken, 0);
                 
                 // Base 50 + Time Bonus (Match Score)
                 $points = 50 + (int) round($timeRemaining * 10);
@@ -144,7 +165,8 @@ class GameStateService
     
             $match->update([
                 'player_scores' => $scores,
-                'round_answers' => $answers
+                'round_answers' => $answers,
+                // Ensure we don't wipe rematch flags if any (though usually cleared on start)
             ]);
     
             $this->ablyService->publish(
@@ -181,6 +203,11 @@ class GameStateService
         if ($currentQId) {
              $q = Question::find($currentQId);
              if ($q) {
+                 // Determine delay based on round index
+                 $delay = ($match->current_question_index == 0) ? 6 : 3;
+                 $sentAt = $match->last_question_at ? $match->last_question_at->timestamp : now()->timestamp;
+                 $startAt = $match->last_question_at ? $match->last_question_at->addSeconds($delay)->timestamp : now()->addSeconds($delay)->timestamp;
+
                  $currentQuestion = [
                     'question_id' => $q->id,
                     'text' => $q->question_text,
@@ -191,7 +218,8 @@ class GameStateService
                     'round_index' => $match->current_question_index + 1,
                     'total_rounds' => 5,
                     'time_limit' => 15,
-                    'sent_at' => $match->last_question_at ? $match->last_question_at->timestamp : now()->timestamp
+                    'sent_at' => $sentAt,
+                    'start_at' => $startAt
                  ];
              }
         }

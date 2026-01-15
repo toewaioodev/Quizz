@@ -58,6 +58,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/match/{id}/answer', [GameController::class, 'submitAnswer'])->name('match.answer');
     Route::get('/match/{id}/state', [GameController::class, 'getCurrentState'])->name('match.state');
     Route::post('/match/{id}/next', [GameController::class, 'nextQuestion'])->name('match.next');
+    Route::post('/match/{id}/rematch', [GameController::class, 'rematch'])->name('match.rematch');
 
     // Solo Quiz
     Route::post('/quiz/answer', [QuizController::class, 'answer']);

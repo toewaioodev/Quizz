@@ -19,6 +19,13 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-          $this->call(BilingualQuestionSeeder::class);
+        $this->call(BilingualQuestionSeeder::class);
+        $this->call(GeneralKnowledgeQuestionSeeder::class);
+        $this->call(ArtsLitQuestionSeeder::class);
+        $this->call(ScienceQuestionSeeder::class);
+        $this->call(GeographyQuestionSeeder::class);
+        $this->call(HistoryQuestionSeeder::class);
+        $this->call(MathQuestionSeeder::class);
+        $this->call(TechnologyQuestionSeeder::class);
     }
 }

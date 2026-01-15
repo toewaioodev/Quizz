@@ -1,67 +1,73 @@
 {
   "node_modules/laravel-vite-plugin/inertia-helpers/index.js": [],
-  "resources/js/Components/ArenaHeader.tsx": [
-    "/build/assets/Arena-BUK_jAjt.js"
+  "resources/js/components/ArenaHeader.tsx": [
+    "/build/assets/Arena-C4A9U4jp.js"
   ],
-  "resources/js/Components/DropDown.tsx": [
-    "/build/assets/Navbar-ClTv28i5.js"
+  "resources/js/components/DropDown.tsx": [
+    "/build/assets/Navbar-DMrX0KVo.js"
   ],
-  "resources/js/Components/LanguageSwitcher.tsx": [
-    "/build/assets/Navbar-ClTv28i5.js"
+  "resources/js/components/LanguageSwitcher.tsx": [
+    "/build/assets/Navbar-DMrX0KVo.js"
   ],
-  "resources/js/Components/Navbar.tsx": [
-    "/build/assets/Navbar-ClTv28i5.js"
+  "resources/js/components/Navbar.tsx": [
+    "/build/assets/Navbar-DMrX0KVo.js"
   ],
-  "resources/js/Components/ThemeSwitcher.tsx": [
-    "/build/assets/ThemeSwitcher-C4YGyEOA.js"
+  "resources/js/components/ThemeSwitcher.tsx": [
+    "/build/assets/Navbar-DMrX0KVo.js"
+  ],
+  "resources/js/components/leaderboard/Podium.tsx": [
+    "/build/assets/Index-C4V5FIsx.js"
+  ],
+  "resources/js/components/ui/BottomNav.tsx": [
+    "/build/assets/Index-C4V5FIsx.js"
   ],
   "resources/js/hooks/useGameEngine.ts": [
-    "/build/assets/Arena-BUK_jAjt.js"
+    "/build/assets/Arena-C4A9U4jp.js"
   ],
   "resources/js/pages/About.tsx": [
-    "/build/assets/About-BEZ_4-PK.js"
+    "/build/assets/About-DFZMo354.js"
   ],
   "resources/js/pages/Arena.tsx": [
-    "/build/assets/Arena-BUK_jAjt.js"
+    "/build/assets/Arena-C4A9U4jp.js"
   ],
   "resources/js/pages/Auth/Login.tsx": [
-    "/build/assets/Login-CNZe5lmm.js"
+    "/build/assets/Login-CO0QzX8t.js"
   ],
   "resources/js/pages/Auth/Register.tsx": [
-    "/build/assets/Register-BqjDum0s.js"
+    "/build/assets/Register-B3C7FolX.js"
   ],
   "resources/js/pages/Dashboard.tsx": [
-    "/build/assets/Dashboard-w4GVquy5.js"
+    "/build/assets/Dashboard-BuPvMthy.js"
   ],
   "resources/js/pages/FAQ.tsx": [
-    "/build/assets/FAQ-dv5cSGrR.js"
+    "/build/assets/FAQ-BuOxXBlf.js"
   ],
   "resources/js/pages/Features.tsx": [
-    "/build/assets/Features-CkdwZx9M.js"
+    "/build/assets/Features-C_E-RkQR.js"
   ],
   "resources/js/pages/Leaderboard/Index.tsx": [
-    "/build/assets/Index-COwV2IV7.js"
+    "/build/assets/Index-C4V5FIsx.js"
   ],
   "resources/js/pages/Lobby.tsx": [
-    "/build/assets/Lobby-D6BysWn0.js"
+    "/build/assets/Lobby-BnMB9lcz.js"
   ],
   "resources/js/pages/Pricing.tsx": [
-    "/build/assets/Pricing-DaI5GaOB.js"
+    "/build/assets/Pricing-DSzwHBam.js"
   ],
   "resources/js/pages/Privacy.tsx": [
-    "/build/assets/Privacy-DwdNZYC-.js"
+    "/build/assets/Privacy-m6XA2iS4.js"
   ],
   "resources/js/pages/Profile/Show.tsx": [
-    "/build/assets/Show-2EsYkeZ4.js"
+    "/build/assets/Show-CZ8NJ-7v.js"
   ],
   "resources/js/pages/Quiz/CategoryQuiz.tsx": [
     "/build/assets/CategoryQuiz-DpYV6Fjk.js"
   ],
   "resources/js/pages/Terms.tsx": [
-    "/build/assets/Terms-D6l0sVa4.js"
+    "/build/assets/Terms-BL8IFr0O.js"
   ],
   "resources/js/pages/welcome.tsx": [
-    "/build/assets/welcome-Ch9l5sc1.js"
+    "/build/assets/welcome-DeWdv-vZ.js"
   ],
   "resources/js/ssr.tsx": []
 }

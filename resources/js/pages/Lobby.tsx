@@ -1,8 +1,10 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ChannelProvider, useChannel } from 'ably/react';
 import axios from 'axios';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDebounce } from '../hooks/useDebounce';
+import BottomNav from '../components/BottomNav';
 import Navbar from '../components/Navbar';
 import { SharedData } from '../types';
 
@@ -78,6 +80,7 @@ function LobbyContent() {
             name: user.name,
             id: user.id,
             profile_photo_url: user.profile_photo_url,
+            username: user.username,
             status: 'searching',
         });
 
@@ -98,6 +101,7 @@ function LobbyContent() {
                     name: user.name,
                     id: user.id,
                     profile_photo_url: user.profile_photo_url,
+                    username: user.username,
                     status: 'online',
                 });
             });
@@ -115,7 +119,7 @@ function LobbyContent() {
                 <div className="absolute inset-0 bg-[url('/images/grid.svg')] bg-center opacity-10 [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
             </div>
 
-            <div className="z-10 mt-8 grid w-full max-w-6xl grid-cols-1 items-start gap-8 p-4 md:grid-cols-12 md:p-8">
+            <div className="z-10 mt-8 grid w-full max-w-6xl grid-cols-1 items-start gap-8 p-4 md:grid-cols-12 md:p-8 pb-24">
                 {/* Left Column: Actions (Span 7) */}
                 <div className="flex flex-col gap-8 md:col-span-7">
                     <div className="space-y-2">
@@ -134,6 +138,8 @@ function LobbyContent() {
                     <ActivePlayersList activeUsers={activeUsers} user={user} handleInvite={handleInvite} />
                 </div>
             </div>
+
+            <BottomNav />
         </div>
     );
 }
@@ -169,8 +175,8 @@ const LobbyStats = memo(({ user, searching, findMatch }: { user: any; searching:
                 onClick={findMatch}
                 disabled={searching || !canPlay}
                 className={`group relative w-full overflow-hidden rounded-2xl p-[1px] transition-all hover:scale-[1.01] active:scale-[0.99] ${!canPlay
-                        ? 'cursor-not-allowed opacity-50 grayscale'
-                        : 'bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 shadow-lg shadow-indigo-500/20'
+                    ? 'cursor-not-allowed opacity-50 grayscale'
+                    : 'bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 shadow-lg shadow-indigo-500/20'
                     }`}
             >
                 <div className="relative flex h-16 w-full items-center justify-center gap-3 rounded-2xl bg-slate-900/90 backdrop-blur-sm transition-colors group-hover:bg-transparent">
@@ -236,6 +242,46 @@ const LobbyActions = memo(() => {
 
 const ActivePlayersList = memo(({ activeUsers, user, handleInvite }: { activeUsers: any[]; user: any; handleInvite: (id: number) => void }) => {
     const { t } = useTranslation();
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+    const [searchResults, setSearchResults] = useState<any[] | null>(null);
+    const [isSearchingAPI, setIsSearchingAPI] = useState(false);
+
+    useEffect(() => {
+        if (!debouncedSearchTerm) {
+            setSearchResults(null);
+            return;
+        }
+
+        setIsSearchingAPI(true);
+        axios.get('/users/search', { params: { query: debouncedSearchTerm } })
+            .then((res) => {
+                setSearchResults(res.data);
+            })
+            .catch((err) => {
+                console.error("Search failed", err);
+                setSearchResults([]);
+            })
+            .finally(() => setIsSearchingAPI(false));
+    }, [debouncedSearchTerm]);
+
+    const displayUsers = useDebounce(useMemo(() => {
+        if (!debouncedSearchTerm) {
+            return activeUsers;
+        }
+
+        if (!searchResults) return [];
+
+        return searchResults.map((user) => {
+            // Check if this user is currently active (in Ably presence)
+            const activeUser = activeUsers.find((u) => u.id === user.id);
+            if (activeUser) {
+                return { ...user, ...activeUser }; // Use active data (status, etc.)
+            }
+            return { ...user, status: 'offline' };
+        });
+    }, [debouncedSearchTerm, activeUsers, searchResults]), 50);
+
     return (
         <div className="flex h-full min-h-[500px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-900/50 backdrop-blur-md">
             <div className="border-b border-white/5 p-6">
@@ -247,18 +293,42 @@ const ActivePlayersList = memo(({ activeUsers, user, handleInvite }: { activeUse
                     {t('Active Players')}
                     <span className="ml-auto rounded-full bg-white/10 px-2 py-0.5 text-xs text-slate-300">{activeUsers.length}</span>
                 </h2>
+
+                {/* Search Input */}
+                <div className="mt-4 relative">
+                    <input
+                        type="text"
+                        placeholder={t('Search players...')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 pl-10 text-sm text-white placeholder-slate-500 focus:border-blue-500 focus:ring-0"
+                    />
+                    <svg className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
             </div>
 
             <div className="custom-scrollbar flex-1 overflow-y-auto p-4 space-y-2">
-                {activeUsers.length === 0 ? (
+                {isSearchingAPI ? (
+                    <div className="flex justify-center p-4">
+                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/30 border-t-blue-500"></div>
+                    </div>
+                ) : displayUsers.length === 0 ? (
                     <div className="flex h-full flex-col items-center justify-center text-slate-500">
-                        <div className="mb-4 rounded-full bg-white/5 p-4">
-                            <svg className="h-8 w-8 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                        </div>
-                        <p>{t('No active players yet.')}</p>
+                        {searchTerm ? (
+                            <p>{t('No players found.')}</p>
+                        ) : (
+                            <>
+                                <div className="mb-4 rounded-full bg-white/5 p-4">
+                                    <svg className="h-8 w-8 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                                </div>
+                                <p>{t('No active players yet.')}</p>
+                            </>
+                        )}
                     </div>
                 ) : (
-                    activeUsers.map((p: any) => (
+                    displayUsers.map((p: any) => (
                         <div
                             key={p.id}
                             className={`group flex items-center gap-4 rounded-2xl border border-transparent p-3 transition-all hover:bg-white/5 ${p.id === user.id ? 'bg-white/5 border-white/5' : ''}`}
@@ -270,18 +340,19 @@ const ActivePlayersList = memo(({ activeUsers, user, handleInvite }: { activeUse
                                     className="h-10 w-10 rounded-full object-cover ring-2 ring-white/10 transition-all group-hover:ring-white/30"
                                 />
                                 <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-slate-900 ${p.status === 'playing' ? 'bg-orange-500' :
-                                        p.status === 'searching' ? 'bg-blue-500' :
-                                            'bg-green-500'
+                                    p.status === 'searching' ? 'bg-blue-500' :
+                                        p.status === 'online' ? 'bg-green-500' : 'bg-slate-500'
                                     }`}></div>
                             </div>
 
                             <div className="flex-1 overflow-hidden">
                                 <p className="truncate text-sm font-bold text-slate-200">
                                     {p.name}
+                                    {p.username && <span className="ml-1 text-xs font-normal text-slate-400">@{p.username}</span>}
                                     {p.id == user.id && <span className="ml-2 text-xs font-normal text-slate-500">({t('You')})</span>}
                                 </p>
                                 <p className="text-xs text-slate-500">
-                                    {p.status === 'playing' ? t('In Match') : p.status === 'searching' ? t('Searching...') : t('Online')}
+                                    {p.status === 'playing' ? t('In Match') : p.status === 'searching' ? t('Searching...') : p.status === 'online' ? t('Online') : t('Offline')}
                                 </p>
                             </div>
 

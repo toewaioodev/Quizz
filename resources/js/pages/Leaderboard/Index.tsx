@@ -1,5 +1,5 @@
 import { Podium } from '@/components/leaderboard/Podium';
-import { BottomNav } from '@/components/ui/BottomNav';
+import BottomNav from '@/components/BottomNav';
 import { Head, usePage } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../../components/Navbar';
@@ -28,7 +28,7 @@ export default function Leaderboard({ users }: { users: User[] }) {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-gray-100 pb-20">
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-gray-100 pb-24 md:pb-0">
             <Head title="Leaderboard" />
             <Navbar />
 
@@ -72,15 +72,15 @@ export default function Leaderboard({ users }: { users: User[] }) {
                                 <div
                                     key={user.id}
                                     className={`group grid grid-cols-12 items-center gap-4 px-4 py-3 transition-all ${isMe
-                                            ? 'bg-blue-50/80 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20'
-                                            : 'hover:bg-slate-50 dark:hover:bg-white/5'
+                                        ? 'bg-blue-50/80 hover:bg-blue-100 dark:bg-blue-500/10 dark:hover:bg-blue-500/20'
+                                        : 'hover:bg-slate-50 dark:hover:bg-white/5'
                                         }`}
                                 >
                                     <div className="col-span-2 flex justify-center">
                                         <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-black ${rank === 1 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400' :
-                                                rank === 2 ? 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300' :
-                                                    rank === 3 ? 'bg-orange-100 text-orange-800 dark:bg-orange-500/20 dark:text-orange-400' :
-                                                        'text-slate-500 dark:text-slate-500'
+                                            rank === 2 ? 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300' :
+                                                rank === 3 ? 'bg-orange-100 text-orange-800 dark:bg-orange-500/20 dark:text-orange-400' :
+                                                    'text-slate-500 dark:text-slate-500'
                                             }`}>
                                             {rank}
                                         </div>

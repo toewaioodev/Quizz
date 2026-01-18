@@ -222,4 +222,28 @@ class GameController extends Controller
         ]);
     }
 
+    public function searchUsers(Request $request)
+    {
+        $query = $request->input('query');
+        if (empty($query)) {
+            return response()->json([]);
+        }
+
+        $users = \App\Models\User::where('name', 'like', "%{$query}%")
+            ->orWhere('username', 'like', "%{$query}%")
+            ->select('id', 'name', 'username', 'profile_photo_path')
+            ->limit(20)
+            ->get();
+            
+        $users->transform(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_photo_url' => $user->profile_photo_url,
+            ];
+        });
+
+        return response()->json($users);
+    }
 }

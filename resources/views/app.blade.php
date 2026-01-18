@@ -6,8 +6,20 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
+        {{-- Social Media Meta Tags --}}
+        <meta property="og:title" content="{{ $meta['title'] ?? 'Toewaioo - Real-time Quiz Battles' }}">
+        <meta property="og:description" content="{{ $meta['description'] ?? 'Compete in real-time 1v1 quiz battles. Join the arena and test your knowledge!' }}">
+        <meta property="og:image" content="{{ $meta['image'] ?? asset('images/og-image.jpg') }}">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:type" content="website">
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $meta['title'] ?? 'Toewaioo - Real-time Quiz Battles' }}">
+        <meta name="twitter:description" content="{{ $meta['description'] ?? 'Compete in real-time 1v1 quiz battles. Join the arena and test your knowledge!' }}">
+        <meta name="twitter:image" content="{{ $meta['image'] ?? asset('images/og-image.jpg') }}">
+
         <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <!-- <link rel="icon" href="/favicon.svg" type="image/svg+xml"> -->
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         {{-- PWA Manifest & Meta --}}

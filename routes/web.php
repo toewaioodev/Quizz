@@ -35,6 +35,8 @@ Route::get('/terms', function () {
 
 // Guest Routes
 
+Route::get('/u/{identifier}', [ProfileController::class, 'show'])->name('profile.public');
+
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
@@ -59,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/match/{id}/state', [GameController::class, 'getCurrentState'])->name('match.state');
     Route::post('/match/{id}/next', [GameController::class, 'nextQuestion'])->name('match.next');
     Route::post('/match/{id}/rematch', [GameController::class, 'rematch'])->name('match.rematch');
+    Route::get('/users/search', [GameController::class, 'searchUsers'])->name('users.search');
 
     // Solo Quiz
     Route::post('/quiz/answer', [QuizController::class, 'answer']);

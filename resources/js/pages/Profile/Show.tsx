@@ -2,6 +2,7 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import BottomNav from '../../components/BottomNav';
 import Navbar from '../../components/Navbar';
 import { SharedData } from '../../types';
 
@@ -34,6 +35,7 @@ export default function Profile({ status, history, stats }: { status?: string, h
             difficulty: user.settings?.difficulty || 'medium',
         },
         photo_url: user.profile_photo_path || '',
+        username: user.username || '',
     });
 
     const submit = (e: React.FormEvent) => {
@@ -42,7 +44,7 @@ export default function Profile({ status, history, stats }: { status?: string, h
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-gray-100">
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-gray-100 pb-20 md:pb-0">
             <Head title="Profile" />
             <Navbar />
 
@@ -65,14 +67,15 @@ export default function Profile({ status, history, stats }: { status?: string, h
                         </div>
 
                         <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">{user.name}</h1>
+                        {user.username && <p className="text-sm font-bold text-indigo-500">@{user.username}</p>}
                         <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{user.email}</p>
 
                         <div className="mt-6 flex w-full max-w-xs items-center justify-center rounded-xl bg-slate-100 p-1 dark:bg-slate-800/50">
                             <button
                                 onClick={() => setActiveTab('activity')}
                                 className={`flex-1 rounded-lg py-2 text-sm font-bold transition-all ${activeTab === 'activity'
-                                        ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
-                                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                                    ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+                                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                                     }`}
                             >
                                 {t('Activity')}
@@ -80,8 +83,8 @@ export default function Profile({ status, history, stats }: { status?: string, h
                             <button
                                 onClick={() => setActiveTab('settings')}
                                 className={`flex-1 rounded-lg py-2 text-sm font-bold transition-all ${activeTab === 'settings'
-                                        ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
-                                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                                    ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+                                    : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                                     }`}
                             >
                                 {t('Settings')}
@@ -153,7 +156,7 @@ export default function Profile({ status, history, stats }: { status?: string, h
                                                             alt=""
                                                         />
                                                         <div className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white dark:border-slate-800 ${match.result === 'win' ? 'bg-green-500' :
-                                                                match.result === 'loss' ? 'bg-red-500' : 'bg-slate-400'
+                                                            match.result === 'loss' ? 'bg-red-500' : 'bg-slate-400'
                                                             }`} />
                                                     </div>
 
@@ -168,7 +171,7 @@ export default function Profile({ status, history, stats }: { status?: string, h
 
                                                     <div className="text-right">
                                                         <div className={`font-black ${match.result === 'win' ? 'text-green-500' :
-                                                                match.result === 'loss' ? 'text-red-500' : 'text-slate-500'
+                                                            match.result === 'loss' ? 'text-red-500' : 'text-slate-500'
                                                             }`}>
                                                             {match.result === 'win' ? 'WON' : match.result === 'loss' ? 'LOST' : 'DRAW'}
                                                         </div>
@@ -222,12 +225,47 @@ export default function Profile({ status, history, stats }: { status?: string, h
                                             {errors.photo_url && <div className="mt-1 text-xs text-red-500">{errors.photo_url}</div>}
                                         </div>
 
+                                        {/* Public Profile Link */}
+                                        <div>
+                                            <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-400">{t('Public Profile Link')}</label>
+                                            <div className="relative flex items-center rounded-xl bg-indigo-50 px-4 py-3 dark:bg-indigo-900/20">
+                                                <div className="min-w-0 flex-1 truncate text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                                                    {`${window.location.origin}/u/${user.username || user.id}`}
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(`${window.location.origin}/u/${user.username || user.id}`);
+                                                        alert(t('Link copied!'));
+                                                    }}
+                                                    className="ml-3 rounded-lg bg-white p-1.5 text-indigo-500 shadow-sm transition-colors hover:text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300 dark:hover:text-indigo-200"
+                                                >
+                                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <p className="mt-2 text-xs text-slate-400">{t('Share this link to show off your stats.')}</p>
+                                        </div>
+
                                         <div className="grid gap-5">
                                             <div>
                                                 <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-400">{t('Display Name')}</label>
                                                 <div className="w-full rounded-xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700 dark:bg-slate-900/50 dark:text-slate-300">
                                                     {user.name}
                                                 </div>
+                                            </div>
+
+                                            <div>
+                                                <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-400">{t('Username')}</label>
+                                                <input
+                                                    type="text"
+                                                    className="w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-900 transition-colors focus:border-blue-500 focus:ring-0 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white"
+                                                    value={data.username}
+                                                    onChange={(e) => setData('username', e.target.value)}
+                                                    placeholder={t('Set a unique username')}
+                                                />
+                                                {errors.username && <div className="mt-1 text-xs text-red-500">{errors.username}</div>}
                                             </div>
 
                                             <div>
@@ -294,6 +332,8 @@ export default function Profile({ status, history, stats }: { status?: string, h
                     </AnimatePresence>
                 </main>
             </div>
+
+            <BottomNav />
         </div>
     );
 }

@@ -13,6 +13,7 @@ export interface SharedData {
 export interface User {
     id: number;
     name: string;
+    username?: string;
     email: string;
     avatar?: string;
     profile_photo_path?: string;

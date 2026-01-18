@@ -18,8 +18,8 @@ export default function Navbar() {
             <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 {/* Logo & Brand */}
                 <Link href="/" className="group flex items-center space-x-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 text-xl font-bold text-white shadow-lg shadow-blue-500/20 transition-transform group-hover:scale-105">
-                        Q
+                    <div className=" overflow-hidden flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 text-xl font-bold text-white shadow-lg shadow-blue-500/20 transition-transform group-hover:scale-105">
+                        <img className="h-full w-full object-cover" src="/logo.png" alt="Quizz" />
                     </div>
                     <span className="text-xl font-extrabold tracking-tight text-slate-800 dark:text-white">Quizz</span>
                 </Link>

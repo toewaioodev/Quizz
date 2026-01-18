@@ -62,10 +62,15 @@ class ProfileController extends Controller
             'settings' => 'nullable|array',
             'settings.difficulty' => 'nullable|string|in:easy,medium,hard',
             'photo_url' => 'nullable|url|max:2048',
+            'username' => 'nullable|string|max:255|unique:users,username,' . $request->user()->id,
         ]);
 
         $user = $request->user();
         
+        if ($request->has('username')) {
+            $user->username = $request->input('username');
+        }
+
         if ($request->has('photo_url')) {
             $user->profile_photo_path = $request->input('photo_url');
         }
@@ -79,5 +84,82 @@ class ProfileController extends Controller
         $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Display the user's public profile.
+     */
+    public function show($identifier)
+    {
+        $user = \App\Models\User::where('username', $identifier)->first();
+
+        if (!$user && is_numeric($identifier)) {
+            $user = \App\Models\User::find($identifier);
+        }
+
+        if (!$user) {
+            abort(404);
+        }
+
+        // Fetch History
+        $history = \App\Models\QuizMatch::where('player1_id', $user->id)
+            ->orWhere('player2_id', $user->id)
+            ->with(['player1', 'player2', 'winner'])
+            ->where('status', 'completed') // Only completed matches
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function ($match) use ($user) {
+                $isPlayer1 = $match->player1_id === $user->id;
+                $opponent = $isPlayer1 ? $match->player2 : $match->player1;
+                
+                return [
+                    'id' => $match->id,
+                    'opponent' => $opponent ? [
+                        'name' => $opponent->name,
+                        'avatar' => $opponent->profile_photo_url,
+                        'username' => $opponent->username,
+                    ] : null,
+                    'result' => $match->winner_id === $user->id ? 'win' : ($match->winner_id ? 'loss' : 'draw'),
+                    'date' => $match->created_at->diffForHumans(),
+                ];
+            });
+
+        // Calculate Level and Rank (Leaderboard Position)
+        $level = floor($user->points / 100) + 1;
+        $rank = \App\Models\User::where('points', '>', $user->points)->count() + 1;
+        
+        // Tier Title (for visual flair)
+        $tierTitle = match (true) {
+            $user->points >= 1000 => 'Grandmaster',
+            $user->points >= 500 => 'Master',
+            $user->points >= 200 => 'Diamond',
+            $user->points >= 100 => 'Gold',
+            $user->points >= 50 => 'Silver',
+            default => 'Bronze',
+        };
+
+        return Inertia::render('Profile/Public', [
+            'profile' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'profile_photo_url' => $user->profile_photo_url,
+                'points' => $user->points,
+                'wins' => $user->wins,
+                'losses' => $user->losses,
+                'created_at' => $user->created_at->format('M Y'),
+                'level' => $level,
+                'rank' => $rank,
+                'rank_title' => $tierTitle,
+            ],
+            'history' => $history,
+        ])->withViewData([
+            'meta' => [
+                'title' => "{$user->name}'s Profile | Toewaioo",
+                'description' => "Check out {$user->name} on Toewaioo! Level {$level} {$tierTitle}. Wins: {$user->wins}, Points: {$user->points}.",
+                'image' => $user->profile_photo_url,
+            ]
+        ]);
     }
 }

@@ -79,3 +79,32 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
+
+Route::get('/debug-s3', function () {
+    try {
+        $disk = \Illuminate\Support\Facades\Storage::disk('supabase');
+        // Try listing files to check connectivity/path
+        $files = $disk->files(''); 
+        
+        $disk->put('debug.txt', 'Test content ' . now());
+        $url = $disk->url('debug.txt');
+        
+        $configBucket = config('filesystems.disks.supabase.bucket');
+        $warning = null;
+        if (str_contains($configBucket, '/')) {
+            $warning = "⚠️ POTENTIAL ERROR: Your bucket name '$configBucket' contains slashes. It should NOT be a path. It should be just the name (e.g., 'avatars').";
+        }
+
+        return [
+            'message' => 'Upload attempted',
+            'warning' => $warning,
+            'url' => $url,
+            'files_in_bucket_root' => $files,
+            'config_bucket' => $configBucket,
+            'config_endpoint' => config('filesystems.disks.supabase.endpoint'),
+            'config_region' => config('filesystems.disks.supabase.region'),
+        ];
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage() . "<br>Trace: " . $e->getTraceAsString();
+    }
+});

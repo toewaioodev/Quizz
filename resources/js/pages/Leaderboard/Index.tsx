@@ -1,6 +1,6 @@
 import { Podium } from '@/components/leaderboard/Podium';
 import BottomNav from '@/components/BottomNav';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, Link } from '@inertiajs/react';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../../components/Navbar';
 import { SharedData, User } from '../../types';
@@ -15,6 +15,8 @@ export default function Leaderboard({ users }: { users: User[] }) {
         name: user.name,
         avatar: user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.name}`,
         points: user.points,
+        id: user.id,
+        username: user.username,
     }));
 
     // Pad with placeholders if fewer than 3 players
@@ -28,14 +30,16 @@ export default function Leaderboard({ users }: { users: User[] }) {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-gray-100 pb-24 md:pb-0">
+        <div className="min-h-screen font-sans text-slate-900 transition-colors duration-300 dark:text-gray-100 pb-24 md:pb-0 relative isolate">
             <Head title="Leaderboard" />
             <Navbar />
 
-            {/* Background Gradients */}
-            <div className="pointer-events-none fixed inset-0 overflow-hidden opacity-30 dark:opacity-40">
-                <div className="absolute -top-[20%] -left-[10%] h-[500px] w-[500px] rounded-full bg-purple-500/20 blur-[120px]" />
-                <div className="absolute -bottom-[20%] -right-[10%] h-[500px] w-[500px] rounded-full bg-blue-500/20 blur-[120px]" />
+            {/* Background decoration */}
+            <div className="fixed inset-0 -z-10 overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-300 pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] h-[600px] w-[600px] animate-pulse rounded-full bg-blue-200/40 dark:bg-blue-600/20 blur-[120px]" />
+                <div className="absolute right-[-10%] bottom-[-10%] h-[600px] w-[600px] animate-pulse rounded-full bg-purple-200/40 dark:bg-purple-600/20 blur-[120px] delay-1000" />
+                <div className="absolute top-[20%] left-[50%] h-[400px] w-[400px] -translate-x-1/2 animate-pulse rounded-full bg-indigo-200/30 dark:bg-indigo-500/10 blur-[100px] delay-500" />
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]"></div>
             </div>
 
             <main className="relative z-10 mx-auto max-w-lg px-4 pt-6 sm:max-w-2xl">
@@ -86,7 +90,7 @@ export default function Leaderboard({ users }: { users: User[] }) {
                                         </div>
                                     </div>
 
-                                    <div className="col-span-6 flex items-center gap-3 min-w-0">
+                                    <Link href={`/u/${user.username || user.id}`} className="col-span-6 flex items-center gap-3 min-w-0 group-hover:opacity-80 transition-opacity">
                                         <img
                                             src={user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.name}`}
                                             alt={user.name}
@@ -100,7 +104,7 @@ export default function Leaderboard({ users }: { users: User[] }) {
                                                 {user.wins} {t('Wins')}
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
 
                                     <div className="col-span-4 text-right">
                                         <div className="font-black text-slate-900 dark:text-white">{user.points}</div>

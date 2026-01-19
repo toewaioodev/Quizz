@@ -79,7 +79,6 @@ const GameOverDisplay = memo(({ user, opponent, score, opponentScore, isWinner, 
                     {/* Opponent */}
                     <div className="flex flex-col items-center">
                         <div className="overflow-hidden relative mb-4 h-20 w-20 rounded-full border-4 border-purple-500 shadow-xl shadow-purple-500/20 md:h-24 md:w-24">
-
                             <img
                                 src={opponent?.profile_photo_url || opponent?.avatar}
                                 alt={opponent?.name}

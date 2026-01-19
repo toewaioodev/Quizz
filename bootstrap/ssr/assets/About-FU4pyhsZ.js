@@ -1,0 +1,30 @@
+import { jsxs, Fragment, jsx } from "react/jsx-runtime";
+import { N as Navbar } from "./Navbar-CzkG3_zV.js";
+import { Head } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
+import "@headlessui/react";
+import "@heroicons/react/24/outline";
+import "react";
+import "@heroicons/react/20/solid";
+function About() {
+  const { t } = useTranslation();
+  return /* @__PURE__ */ jsxs(Fragment, { children: [
+    /* @__PURE__ */ jsx(Head, { title: t("about.title") }),
+    /* @__PURE__ */ jsxs("div", { className: "min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-slate-900 dark:text-white", children: [
+      /* @__PURE__ */ jsx(Navbar, {}),
+      /* @__PURE__ */ jsxs("main", { className: "mx-auto max-w-4xl px-6 py-12", children: [
+        /* @__PURE__ */ jsx("h1", { className: "mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-4xl font-bold text-transparent", children: t("about.title") }),
+        /* @__PURE__ */ jsxs("div", { className: "prose dark:prose-invert max-w-none space-y-6", children: [
+          /* @__PURE__ */ jsx("p", { className: "text-lg text-slate-700 dark:text-slate-300", children: t("about.description") }),
+          /* @__PURE__ */ jsx("h2", { className: "mt-8 mb-4 text-2xl font-semibold", children: t("about.mission_title") }),
+          /* @__PURE__ */ jsx("p", { className: "text-slate-600 dark:text-slate-400", children: t("about.mission_desc") }),
+          /* @__PURE__ */ jsx("h2", { className: "mt-8 mb-4 text-2xl font-semibold", children: t("about.team_title") }),
+          /* @__PURE__ */ jsx("p", { className: "text-slate-600 dark:text-slate-400", children: t("about.team_desc") })
+        ] })
+      ] })
+    ] })
+  ] });
+}
+export {
+  About as default
+};

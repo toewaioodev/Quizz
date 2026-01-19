@@ -1,9 +1,10 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import BottomNav from '../../components/BottomNav';
 import Navbar from '../../components/Navbar';
+import ImageCropper from '../../components/ImageCropper';
 import { SharedData } from '../../types';
 
 interface MatchHistory {
@@ -28,19 +29,48 @@ export default function Profile({ status, history, stats }: { status?: string, h
     const { t } = useTranslation();
     const user = usePage<SharedData>().props.auth.user;
     const [activeTab, setActiveTab] = useState<'activity' | 'settings'>('activity');
+    const [showCropper, setShowCropper] = useState(false);
+    const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null);
+    const [uploadingPhoto, setUploadingPhoto] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handlePhotoUpload = (file: File) => {
+        setUploadingPhoto(true);
+        // Use Inertia router to leverage session auth and handle file upload method spoofing
+        router.post('/profile', {
+            _method: 'PATCH',
+            photo: file,
+        }, {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setShowCropper(false);
+                // Inertia automatically updates props, so user.profile_photo_url will be fresh
+            },
+            onError: (errors) => {
+                console.error('Photo upload failed:', errors);
+                alert(t('Failed to upload photo. Please try again.'));
+            },
+            onFinish: () => {
+                setUploadingPhoto(false);
+            },
+        });
+    };
 
     const { data, setData, post, processing, recentlySuccessful, errors } = useForm({
         _method: 'PATCH',
         settings: {
             difficulty: user.settings?.difficulty || 'medium',
         },
-        photo_url: user.profile_photo_path || '',
+        photo: null as File | null,
         username: user.username || '',
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/profile');
+        post('/profile', {
+            forceFormData: true,
+        });
     };
 
     return (
@@ -56,13 +86,44 @@ export default function Profile({ status, history, stats }: { status?: string, h
                     <div className="relative mx-auto flex max-w-lg flex-col items-center px-4 text-center">
                         <div className="relative mb-4">
                             <div className="absolute -inset-1 animate-pulse rounded-full bg-gradient-to-r from-blue-500 to-purple-600 opacity-75 blur dark:opacity-100"></div>
-                            <img
-                                className="relative h-24 w-24 rounded-full border-4 border-white object-cover shadow-xl dark:border-slate-800"
-                                src={data.photo_url || user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.name}`}
-                                alt={user.name}
-                            />
-                            <div className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-xs font-bold text-white shadow-lg ring-2 ring-white dark:ring-slate-900">
-                                {Math.floor((user.points || 0) / 100) + 1}
+                            <div className="relative group">
+                                <img
+                                    className="relative h-24 w-24 rounded-full border-4 border-white object-cover shadow-xl dark:border-slate-800"
+                                    src={user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.name}`}
+                                    alt={user.name}
+                                />
+                                {uploadingPhoto && (
+                                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50">
+                                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                    </div>
+                                )}
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-slate-900 text-white shadow-lg ring-2 ring-white transition-transform active:scale-95 dark:bg-white dark:text-slate-900 dark:ring-slate-900"
+                                >
+                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </button>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                        if (e.target.files && e.target.files.length > 0) {
+                                            const file = e.target.files[0];
+                                            const reader = new FileReader();
+                                            reader.addEventListener('load', () => {
+                                                setSelectedImageSrc(reader.result?.toString() || null);
+                                                setShowCropper(true);
+                                            });
+                                            reader.readAsDataURL(file);
+                                            e.target.value = '';
+                                        }
+                                    }}
+                                />
                             </div>
                         </div>
 
@@ -204,26 +265,7 @@ export default function Profile({ status, history, stats }: { status?: string, h
                             >
                                 <form onSubmit={submit} className="rounded-2xl bg-white p-5 shadow-sm dark:bg-slate-800">
                                     <div className="space-y-6">
-                                        <div className="relative">
-                                            <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-400">{t('Profile Photo')}</label>
-                                            <div className="flex items-center gap-4">
-                                                <img
-                                                    className="h-14 w-14 rounded-full border border-slate-200 dark:border-slate-700"
-                                                    src={data.photo_url || user.profile_photo_url || `https://ui-avatars.com/api/?name=${user.name}`}
-                                                    alt={user.name}
-                                                />
-                                                <div className="flex-1">
-                                                    <input
-                                                        type="url"
-                                                        className="w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium transition-colors focus:border-blue-500 focus:ring-0 dark:border-slate-700 dark:bg-slate-900/50 dark:text-white"
-                                                        value={data.photo_url}
-                                                        onChange={(e) => setData('photo_url', e.target.value)}
-                                                        placeholder="https://..."
-                                                    />
-                                                </div>
-                                            </div>
-                                            {errors.photo_url && <div className="mt-1 text-xs text-red-500">{errors.photo_url}</div>}
-                                        </div>
+                                        {/* Photo input removed from here, moved to header */}
 
                                         {/* Public Profile Link */}
                                         <div>
@@ -334,6 +376,18 @@ export default function Profile({ status, history, stats }: { status?: string, h
             </div>
 
             <BottomNav />
+
+            <ImageCropper
+                isOpen={showCropper}
+                imageSrc={selectedImageSrc}
+                onClose={() => {
+                    setShowCropper(false);
+                    setSelectedImageSrc(null);
+                }}
+                onCropComplete={(croppedFile) => {
+                    handlePhotoUpload(croppedFile);
+                }}
+            />
         </div>
     );
 }

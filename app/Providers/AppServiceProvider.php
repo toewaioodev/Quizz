@@ -13,7 +13,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Services\SupabaseStorage::class, function ($app) {
+            return new \App\Services\SupabaseStorage(
+                config('services.supabase.url'),
+                config('services.supabase.key'),
+                config('services.supabase.bucket')
+            );
+        });
     }
 
     /**

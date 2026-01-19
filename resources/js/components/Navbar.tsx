@@ -114,8 +114,9 @@ export default function Navbar() {
                 <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 transition-transform duration-300 ease-in-out sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 dark:bg-slate-900">
                     <div className="flex items-center justify-between">
                         <Link href="/welcome" className="-m-1.5 flex items-center space-x-3 p-1.5">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-tr from-blue-600 to-purple-600 text-lg font-bold text-white">
-                                Q
+                            <div className="overflow-hidden flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-tr from-blue-600 to-purple-600 text-lg font-bold text-white">
+                                <img className="h-full w-full object-cover" src="/logo.png" alt="Quizz" />
+
                             </div>
                             <span className="text-lg font-bold text-slate-800 dark:text-white">Quizz</span>
                         </Link>

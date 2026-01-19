@@ -61,7 +61,7 @@ class ProfileController extends Controller
         $request->validate([
             'settings' => 'nullable|array',
             'settings.difficulty' => 'nullable|string|in:easy,medium,hard',
-            'photo_url' => 'nullable|url|max:2048',
+            'photo' => 'nullable|image|max:2048', // Validate as image
             'username' => 'nullable|string|max:255|unique:users,username,' . $request->user()->id,
         ]);
 
@@ -71,8 +71,17 @@ class ProfileController extends Controller
             $user->username = $request->input('username');
         }
 
-        if ($request->has('photo_url')) {
-            $user->profile_photo_path = $request->input('photo_url');
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $filename = 'avatars/' . $file->hashName();
+            $result = app(\App\Services\SupabaseStorage::class)->uploadFile($filename, file_get_contents($file->getPathname()), $file->getMimeType());
+            
+            if ($result['success']) {
+                $user->profile_photo_path = $result['url'];
+            } else {
+                // Log failure or handle error
+                \Illuminate\Support\Facades\Log::error('Failed to store profile photo to Supabase: ' . ($result['message'] ?? 'Unknown error'));
+            }
         }
 
         if ($request->has('settings')) {
@@ -156,8 +165,8 @@ class ProfileController extends Controller
             'history' => $history,
         ])->withViewData([
             'meta' => [
-                'title' => "{$user->name}'s Profile | Toewaioo",
-                'description' => "Check out {$user->name} on Toewaioo! Level {$level} {$tierTitle}. Wins: {$user->wins}, Points: {$user->points}.",
+                'title' => "{$user->name}'s Profile | Quizz",
+                'description' => "Check out {$user->name} on Quizz! Level {$level} {$tierTitle}. Wins: {$user->wins}, Points: {$user->points}.",
                 'image' => $user->profile_photo_url,
             ]
         ]);

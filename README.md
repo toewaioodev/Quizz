@@ -1,132 +1,177 @@
-# Quizz - Master the Arena
+# ⚡ Quizz - Master the Arena
 
-**Quizz** is a next-generation competitive quiz platform that blends real-time multiplayer battles with AI-generated content. Built for speed and engagement, it allows players to challenge friends or random opponents in 1v1 knowledge battles, climb global leaderboards, and track their progress with detailed statistics.
+![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Ably](https://img.shields.io/badge/Ably-Realtime-FF5416?style=for-the-badge&logo=ably&logoColor=white)
+![Gemini AI](https://img.shields.io/badge/AI-Gemini-8E75B2?style=for-the-badge&logo=google-bard&logoColor=white)
+
+**Quizz** is a next-generation competitive quiz platform that blends real-time multiplayer battles with user-centric design and AI-generated content. Built for speed and engagement, it allows players to challenge friends or random opponents in 1v1 knowledge battles, climb global leaderboards, and track their progress with detailed statistics.
 
 ![Project Banner](public/images/banner.png)
+![Project Banner](public/images/banner_1.png)
 ![Project Banner](public/images/banner_2.png)
 ![Project Banner](public/images/banner_3.png)
 ![Project Banner](public/images/banner_4.png)
 
+---
+
 ## 🚀 Key Features
 
 ### ⚔️ Real-Time 1v1 Arena
-
-- **Instant Matchmaking**: Find opponents in seconds with our optimized WebSocket-based lobby system.
-- **Live Synchronization**: Experience lag-free gameplay powered by **Ably**, where every second counts.
-- **Competitive Limits**: Only proven players (10+ points) can enter the Arena to ensure quality matches.
+*   **Instant Matchmaking**: Find opponents in seconds with our optimized WebSocket-based lobby system.
+*   **Live Synchronization**: Experience lag-free gameplay powered by **Ably**, ensuring millisecond-level state sync between players.
+*   **Dynamic Scoring**: Points decay over time (15s per question), rewarding speed and accuracy.
+*   **Competitive Limits**: Only proven players (10+ points) can enter the Arena to ensure quality matches.
 
 ### 🧠 AI-Powered Content
+*   **Smart Seeding**: Hybrid database system combining curated real-world questions with AI-generated localization.
+*   **Bilingual Support**: Fully localized interface and questions in **English** and **Burmese**.
 
-- **Infinite Questions**: Integrated with **Google Gemini AI** to generate unique, high-quality trivia questions on demand.
-- **Smart Seeding**: Hybrid database system combining curated real-world questions from OpenTDB with AI-generated localization for infinite variety.
-- **Multi-Language**: Fully localized content and questions in **English** and **Burmese**.
+### 🎨 Modern & Responsive UI
+*   **Glassmorphism Design**: A premium, translucent aesthetic using the latest Tailwind CSS 4.0 techniques.
+*   **Animated Backgrounds**: Immersive, unparalleled visual experience with interactive 3D elements and pulsing gradients.
+*   **Light & Dark Mode**: Fully adaptive themes that look stunning in any lighting condition.
+*   **PWA Support**: Installable on mobile and desktop as a native-like application.
 
-### 🏆 Progression & Social
+### 🏆 Social & Progression
+*   **Global Leaderboard**: Compete for the top spot based on points, wins, and win ratios.
+*   **User Profiles**: Customizable profiles with photo uploads (image cropping & compression included).
+*   **Lobby System**: See who's online, invite friends, and challenge active players directly.
 
-- **Global Leaderboard**: compete for the top spot based on points, wins, and win ratios.
-- **Dynamic Scoring**: Earn points for victories, lose them for defeats.
-- **User Profiles**: Track your win/loss record and rank.
-
-### 🎨 Modern Experience
-
-- **Dual Theme**: info-rich **Light Mode** for clarity and immersive **Dark Mode** for night sessions.
-- **Responsive Design**: A sleek, mobile-first interface built with Tailwind CSS 4.0.
-- **Interactive UI**: Smooth animations, glassmorphism effects, and instant feedback.
+---
 
 ## 🛠 Tech Stack
 
-### Backend (Laravel 12)
+### Backend
+*   **Framework**: [Laravel 12](https://laravel.com) (PHP 8.2+)
+*   **Database**: SQLite (Dev) / MySQL (Prod)
+*   **Real-time**: [Ably](https://ably.com) (WebSockets)
+*   **Storage**: [Supabase](https://supabase.com) (S3-compatible object storage for avatars)
+*   **Authentication**: Laravel Sanctum
+*   **Documentation**: Swagger / L5-Swagger
 
-- **Core**: Laravel 12 providing a robust, secure API and foundation.
-- **Database**: SQLite (Dev) / MySQL (Prod) optimized with custom queries for speed.
-- **Real-time**: Ably for sub-millisecond state synchronization.
-- **AI Integration**: Google Gemini API via custom service layer.
+### Frontend
+*   **Framework**: [React 19](https://react.dev)
+*   **Routing**: [Inertia.js 2.0](https://inertiajs.com)
+*   **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com) & [Headless UI](https://headlessui.com)
+*   **Animations**: [Framer Motion](https://www.framer.com/motion/)
+*   **Icons**: Heroicons & Lucide React
+*   **Utilities**: `date-fns`, `browser-image-compression`, `react-image-crop`
 
-### Frontend (React 19)
-
-- **Framework**: React 19 for a high-performance, component-based UI.
-- **Routing**: Inertia.js 2.0 for seamless server-side routing with SPA feel.
-- **Styling**: Tailwind CSS 4.0 for utility-first, responsive design.
-- **Build**: Vite for lightning-fast HMR and production builds.
-
-## 🎮 Game Mechanics
-
-- **Lobby**: The central hub. Chat (coming soon), see active players, and finding matches.
-- **The Battle**:
-    - **Format**: 1v1, 5 Rounds.
-    - **Timer**: 15 seconds per question. Points decay over time.
-    - **Scoring**: +10 per correct answer. +50 for winning. -10 for losing.
-    - **Endgame**: Instant result calculation and point updates.
+---
 
 ## ⚡ Installation & Setup
 
+Follow these steps to get the project running on your local machine.
+
 ### Prerequisites
+*   PHP >= 8.2
+*   Node.js >= 20
+*   Composer
+*   Ably Account (API Key)
+*   Google Gemini API Key
+*   Supabase Project (URL, Key, Bucket)
 
-- PHP >= 8.2
-- Node.js >= 20
-- Composer
-- Ably Account & API Key
-- Google Gemini API Key
+### 1. Clone the Repository
+```bash
+git clone https://github.com/toewaioo/Quizz.git
+cd Quizz
+```
 
-### Step-by-Step Guide
+### 2. Install Dependencies
+```bash
+# Backend dependencies
+composer install
 
-1.  **Clone the Repository**
+# Frontend dependencies
+npm install
+```
 
-    ```bash
-    git clone https://github.com/toewaioo/Quizz.git
-    cd Quizz
-    ```
+### 3. Environment Configuration
+Copy the example environment file and update it with your credentials:
 
-2.  **Install Dependencies**
+```bash
+cp .env.example .env
+```
 
-    ```bash
-    composer install
-    npm install
-    ```
+Edit `.env` and configure the following:
 
-3.  **Environment Configuration**
+```ini
+APP_NAME=Quizz
+app_url=http://localhost:8000
 
-    ```bash
-    cp .env.example .env
-    ```
+# Database
+DB_CONNECTION=sqlite or pgsql
 
-    Edit `.env` and add your keys:
+# Realtime (Ably)
+ABLY_KEY=your_ably_api_key
 
-    ```ini
-    DB_CONNECTION=sqlite
-    ABLY_KEY=your_ably_key_here
-    GEMINI_API_KEY=your_gemini_key_here
-    ```
+# AI (Google Gemini)
+GEMINI_API_KEY=your_gemini_api_key
 
-4.  **Initialize Application**
+# Storage (Supabase)
+FILESYSTEM_DISK=supabase
+SUPABASE_URL=your_supabase_url
+SUPABASE_API_KEY=your_supabase_key
+SUPABASE_BUCKET_NAME=your_bucket_name
+```
 
-    ```bash
-    php artisan key:generate
-    touch database/database.sqlite
-    php artisan migrate
-    ```
+### 4. Initialize Application
+```bash
+# Generate App Key
+php artisan key:generate
 
-5.  **Seed Question Database**
-    Fetch diverse real-world questions to jumpstart your database:
+# Create SQLite Database
+touch database/database.sqlite
 
-    ```bash
-    php artisan seed:fetch-questions
-    php artisan db:seed --class=QuestionSeeder
-    ```
+# Run Migrations
+php artisan migrate
+```
 
-6.  **Run Development Server**
-    ```bash
-    composer run dev
-    ```
-    Visit `http://localhost:8000` to start playing!
+### 5. Seed Database
+Populate the database with initial questions and categories:
 
-## 📂 Project Architecture
+```bash
+# Fetch questions from external APIs/AI
+php artisan seed:fetch-questions
 
-- **`app/Http/Controllers/GameController.php`**: The brain of the operation. Handles matchmaking logic, point calculations, and lobby enforcement.
-- **`app/Services/AblyService.php`**: Abstraction layer for real-time messaging.
-- **`resources/js/pages/Arena.tsx`**: The main game component. Handles state sync, timers, and UI interactions during battle.
-- **`database/data/*.json`**: Local repositories for question seeding.
+# Seed the database
+php artisan db:seed --class=QuestionSeeder
+```
+
+### 6. Run the Application
+Start the development servers in two separate terminals (or concurrently):
+
+```bash
+# Start Laravel Server
+composer run dev
+```
+*Note: The `dev` script uses `concurrently` to run both PHP and Vite servers.*
+
+Visit `http://localhost:8000` in your browser.
+
+---
+
+## 📂 Project Structure
+
+```
+Quizz/
+├── app/
+│   ├── Http/Controllers/  # Game, Profile, & API logic
+│   ├── Services/          # Ably, Gemini, & Supabase integrations
+│   └── Models/            # User, Question, Quiz models
+├── resources/
+│   ├── js/
+│   │   ├── components/    # Reusable UI components (GlassCard, Button, etc.)
+│   │   ├── pages/         # Full pages (Welcome, Dashboard, Arena, Lobby)
+│   │   └── hooks/         # Custom React hooks (usePresence, useDebounce)
+│   └── css/               # Tailwind entry point
+├── routes/                # Web and API routes
+├── database/              # Migrations and Seeders
+└── public/                # Static assets and build output
+```
 
 ## 📄 License
 
-Open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
